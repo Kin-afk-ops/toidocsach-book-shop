@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 from datetime import timedelta
 import cloudinary
 from app.models.user_model import User  
+from app.models.book_item_model import BookItem  
+from app.models.book_detail_model import BookDetail  
+from app.models.cart_model import Cart  
 
 
 from flask import Flask
@@ -60,6 +63,8 @@ def create_app():
     # Register các blueprint
     from app.routes.auth_route import auth_route
     from app.routes.otp_route import otp_route
+    from app.routes.book_route import book_route
+    from app.routes.cart_route import cart_route
     # from app.routes.speech_routes import speech_route
 
 
@@ -67,6 +72,8 @@ def create_app():
 
     app.register_blueprint(auth_route)
     app.register_blueprint(otp_route)
+    app.register_blueprint(book_route)
+    app.register_blueprint(cart_route)
 
     # app.register_blueprint(speech_route)
 
