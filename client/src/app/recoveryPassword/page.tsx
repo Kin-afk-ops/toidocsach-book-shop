@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { email, z } from "zod";
 import {
   Form,
   FormControl,
@@ -15,9 +15,15 @@ import { Input } from "@/components/ui/input";
 import PrimaryButton from "@/components/customs/PrimaryButton";
 import TransparentButton from "@/components/customs/TransparentButton";
 import { useState } from "react";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { showError, showSuccess, showWarning } from "@/util/styles/toast-utils";
+import LoadingScreen from "@/components/loading/LoadingScreen";
+import { useRouter } from "next/navigation";
 
 const RecoveryPasswordPage = () => {
+  const router = useRouter();
   const [disableInput, setDisableInput] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const formSchema = z.object({
     email: z
       .string()
@@ -42,35 +48,62 @@ const RecoveryPasswordPage = () => {
     },
   });
 
+  const handleSendOtp = async (): Promise<void> => {
+    setLoading(true);
+    const email = form.getValues("email");
+    if (!email) {
+      showWarning("Please enter your email");
+      return;
+    }
+    await axiosInstance
+      .post("/auth/otp/recoveryPassword", {
+        email,
+      })
+      .then(() => {
+        showSuccess("OTP sent successfully!");
+        setDisableInput(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        showError("Failed to send OTP");
+      })
+      .finally(() => setLoading(false));
+  };
+
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
-    // const loginInfo = values;
-    // setLoading(true);
-    // await axiosInstance
-    //   .post("/login", loginInfo)
-    //   .then(async (res) => {
-    //     setLoading(false);
-    //     setUser({
-    //       id: res.data.id,
-    //       username: res.data.username,
-    //       role: res.data.role,
-    //     });
-    //     // await setAuthToken(res.data.access_token);
-    //     showSuccess("Đăng nhập thành công");
-    //     router.push("/");
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     console.log(error);
-    //     showError("Đăng nhập thất bại hãy thử lại");
-    //   });
+    // Lấy dữ liệu
+    const { email, otpCode, password } = values;
 
+    setLoading(true);
+    await axiosInstance
+      .put("auth/recoveryPassword", {
+        email,
+        otp: otpCode,
+        new_password: password, // sửa lại cho đúng
+      })
+      .then((res) => {
+        showSuccess(res.data.message || "Password updated successfully!");
+        router.push("/");
+      })
+      .catch((error) => {
+        // Lấy message lỗi từ response server
+        const msg =
+          error.response?.data?.error ||
+          "Failed to update password. Please try again.";
+        console.log(error);
+        showError(msg);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     console.log(values);
   };
 
   return (
     <div className="max-w-[1230px]  mx-auto px-4 py-6 flex justify-center">
+      {loading && <LoadingScreen />}
       <div className="w-[40%] bg-white flex flex-col items-center rounded">
         <h1 className="uppercase py-4 font-bold text-[18px]">
           Recovery password
@@ -101,7 +134,11 @@ const RecoveryPasswordPage = () => {
                 )}
               />
 
-              <TransparentButton content="Send OTP to Email" />
+              <TransparentButton
+                content="Send OTP to Email"
+                type="button"
+                handleTodo={handleSendOtp}
+              />
 
               <FormField
                 control={form.control}

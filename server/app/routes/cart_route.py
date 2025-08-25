@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from app.utils.jwt_helper import require_user
+
 from app.services.cart_service import (
     get_cart_by_user,
     add_to_cart,
@@ -11,12 +13,14 @@ cart_route = Blueprint("cart_route", __name__)
 
 
 @cart_route.route("/cart/<user_id>", methods=["GET"])
+@require_user
 def get_cart(user_id):
     cart = get_cart_by_user(user_id)
     return jsonify(cart), 200
 
 
 @cart_route.route("/cart/<user_id>/add", methods=["POST"])
+@require_user
 def add_item(user_id):
     data = request.get_json()
     book_id = data.get("book_id")
@@ -27,6 +31,7 @@ def add_item(user_id):
 
 
 @cart_route.route("/cart/<uuid:user_id>/update", methods=["PUT"])
+@require_user
 def update_item(user_id):
     data = request.get_json()
     book_id = data.get("book_id")
@@ -37,6 +42,7 @@ def update_item(user_id):
 
 
 @cart_route.route("/cart/<uuid:user_id>/remove", methods=["DELETE"])
+@require_user
 def remove_item(user_id):
     data = request.get_json()
     book_id = data.get("book_id")
@@ -46,6 +52,7 @@ def remove_item(user_id):
 
 
 @cart_route.route("/cart/<user_id>/clear", methods=["DELETE"])
+@require_user
 def clear(user_id):
     result, status = clear_cart(user_id)
     return jsonify(result), status

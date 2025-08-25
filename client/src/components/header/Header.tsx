@@ -36,9 +36,12 @@ import {
 import AuthBlock from "../auth/AuthBlock";
 import { Badge } from "../ui/badge";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/useUserStore";
 
 const Header = () => {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [language, setLanguage] = useState<{
     label: string;
     value: string;
@@ -67,7 +70,13 @@ const Header = () => {
   const [dialogOpenSignIn, setDialogOpenSignIn] = useState(false);
   const [dialogOpenSignUp, setDialogOpenSignUp] = useState(false);
 
-  const handleSignIn = () => {};
+  const handleLogout = () => {
+    logout();
+    setDialogOpenSignIn(false);
+    setDialogOpenSignUp(false);
+  };
+
+  console.log(user);
 
   return (
     <header className="w-full bg-white">
@@ -486,41 +495,56 @@ const Header = () => {
                 My Account
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[200px] px-4 py-2">
-              <div className="flex flex-col justify-between  gap-4">
-                <Dialog
-                  open={dialogOpenSignIn}
-                  onOpenChange={(v) => setDialogOpenSignIn(v)}
-                >
-                  <DialogTrigger asChild>
-                    <Button className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] rounded-lg text-white transition-colors cursor-pointer">
-                      <span>Sign In</span>
-                    </Button>
-                  </DialogTrigger>
 
-                  <AuthBlock
-                    mode={true}
-                    setDialogOpenSignIn={setDialogOpenSignIn}
-                  />
-                </Dialog>
-
-                <Dialog
-                  open={dialogOpenSignUp}
-                  onOpenChange={(v) => setDialogOpenSignUp(v)}
-                >
-                  <DialogTrigger asChild>
-                    <Button
-                      className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[#e11d48] rounded-lg bg-white text-[#e11d48]
+            {user ? (
+              <DropdownMenuContent className="w-[200px] px-4 py-2">
+                <div className="flex flex-col justify-between  gap-4">
+                  <Button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[var(--text)] rounded-lg bg-white text-[var(--text)]
            hover:scale-105 hover:bg-white transition-transform duration-300 ease-in-out cursor-pointer"
-                    >
-                      <span>Sign up</span>
-                    </Button>
-                  </DialogTrigger>
+                  >
+                    <span>Sign out</span>
+                  </Button>
+                </div>
+              </DropdownMenuContent>
+            ) : (
+              <DropdownMenuContent className="w-[200px] px-4 py-2">
+                <div className="flex flex-col justify-between  gap-4">
+                  <Dialog
+                    open={dialogOpenSignIn}
+                    onOpenChange={(v) => setDialogOpenSignIn(v)}
+                  >
+                    <DialogTrigger asChild>
+                      <Button className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] rounded-lg text-white transition-colors cursor-pointer">
+                        <span>Sign In</span>
+                      </Button>
+                    </DialogTrigger>
 
-                  <AuthBlock mode={false} />
-                </Dialog>
-              </div>
-            </DropdownMenuContent>
+                    <AuthBlock
+                      mode={true}
+                      setDialogOpenSignIn={setDialogOpenSignIn}
+                    />
+                  </Dialog>
+
+                  <Dialog
+                    open={dialogOpenSignUp}
+                    onOpenChange={(v) => setDialogOpenSignUp(v)}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[#e11d48] rounded-lg bg-white text-[#e11d48]
+           hover:scale-105 hover:bg-white transition-transform duration-300 ease-in-out cursor-pointer"
+                      >
+                        <span>Sign up</span>
+                      </Button>
+                    </DialogTrigger>
+
+                    <AuthBlock mode={false} />
+                  </Dialog>
+                </div>
+              </DropdownMenuContent>
+            )}
           </DropdownMenu>
 
           <div className="text-[var(--text)] text-[14px] w-[100px] flex justify-center items-center">

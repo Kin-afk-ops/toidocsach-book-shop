@@ -62,3 +62,31 @@ def login_user_service(data):
     set_refresh_cookies(resp, refresh_token)
 
     return resp, None
+
+
+
+def recovery_password_service(email, otp, new_password):
+    if not email or not otp or not new_password:
+        return {"error": "Thiếu email, otp hoặc mật khẩu mới"}, 400
+
+    # Kiểm tra OTP trong Redis
+    saved_otp = redis_client.get(f"otp:{email}")
+    if not saved_otp:
+        return {"error": "OTP hết hạn hoặc không tồn tại"}, 400
+    if otp != saved_otp:
+        return {"error": "OTP không đúng"}, 400
+
+    # Kiểm tra user tồn tại
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return {"error": "User không tồn tại"}, 404
+
+    # Cập nhật mật khẩu mới
+    hashed_password = generate_password_hash(new_password)
+    user.password = hashed_password
+    db.session.commit()
+
+    # Xoá OTP sau khi dùng
+    redis_client.delete(f"otp:{email}")
+
+    return {"message": "Đổi mật khẩu thành công"}, 200

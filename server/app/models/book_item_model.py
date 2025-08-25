@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
-from sqlalchemy import Text
+from sqlalchemy import Text,ForeignKey
 from app.extensions import db
 
 class BookItem(db.Model):
@@ -21,15 +21,19 @@ class BookItem(db.Model):
     quantity = db.Column(db.Integer, default=0)   # Số lượng còn lại
     sold_count = db.Column(db.Integer, default=0) # Số lượng đã bán
 
+
+    category_id = db.Column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
+    category = relationship("Category", backref="books")
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     detail = relationship("BookDetail", back_populates="book_item", uselist=False, cascade="all, delete-orphan")
 
-    def to_dict(self, include_detail: bool = False):
+    def to_dict(self, include_detail: bool = False, include_category: bool = True):
         data = {
             "id": str(self.id),
             "title": self.title,
-            "images": self.images,  # trả về trực tiếp list object
+            "images": self.images,
             "price": self.price,
             "discount": self.discount,
             "quantity": self.quantity,
@@ -38,9 +42,11 @@ class BookItem(db.Model):
             "updated_at": self.updated_at.isoformat(),
         }
 
-        # Nếu include_detail=True và có dữ liệu detail thì nối vào
         if include_detail and self.detail:
             data["detail"] = self.detail.to_dict()
+
+        if include_category and self.category:
+            data["category"] = self.category.to_dict()
 
         return data
         

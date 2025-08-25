@@ -15,23 +15,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-// import { showError, showSuccess } from "@/utils/styles/toast-utils";
-// import { useAuthStore } from "../../../store/authStore";
+
 import { useEffect, useState } from "react";
 import PrimaryButton from "../customs/PrimaryButton";
 import Link from "next/link";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { showError, showSuccess } from "@/util/styles/toast-utils";
+import { useAuthStore } from "@/store/useUserStore";
+import LoadingScreen from "../loading/LoadingScreen";
+import { Eye, EyeClosed } from "lucide-react";
 
 interface ChildProps {
-  onClose: () => void;
+  onClose?: () => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SignInBlock: React.FC<ChildProps> = ({ onClose }) => {
+const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
   const router = useRouter();
 
-  //   const user = useAuthStore((state) => state.user);
-  // const token = useAuthStore((state) => state.token);
-  //   const setUser = useAuthStore((state) => state.setUser);
-  const [loading, setLoading] = useState<boolean>(false);
+  const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
 
   const formSchema = z.object({
     email: z
@@ -54,26 +58,26 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose }) => {
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
-    // const loginInfo = values;
-    // setLoading(true);
-    // await axiosInstance
-    //   .post("/login", loginInfo)
-    //   .then(async (res) => {
-    //     setLoading(false);
-    //     setUser({
-    //       id: res.data.id,
-    //       username: res.data.username,
-    //       role: res.data.role,
-    //     });
-    //     // await setAuthToken(res.data.access_token);
-    //     showSuccess("Đăng nhập thành công");
-    //     router.push("/");
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     console.log(error);
-    //     showError("Đăng nhập thất bại hãy thử lại");
-    //   });
+    const loginInfo = values;
+    setLoading(true);
+    await axiosInstance
+      .post("/auth/login", loginInfo)
+      .then(async (res) => {
+        setLoading(false);
+        setUser({
+          id: res.data.id,
+          email: res.data.email,
+        });
+
+        showSuccess("Đăng nhập thành công");
+        router.push("/");
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log(error);
+        showError("Đăng nhập thất bại hãy thử lại");
+      })
+      .finally(() => setLoading(false));
 
     console.log(values);
   };
@@ -111,12 +115,27 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose }) => {
               <FormItem>
                 <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter Password"
-                    {...field}
-                    type="password"
-                    autoComplete="current-password"
-                  />
+                  <div className="relative w-full">
+                    <Input
+                      placeholder="Enter Password"
+                      {...field}
+                      type={hidePassword ? "password" : "text"}
+                      autoComplete="current-password"
+                      className="pr-10"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setHidePassword(!hidePassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
+                    >
+                      {hidePassword ? (
+                        <EyeClosed size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

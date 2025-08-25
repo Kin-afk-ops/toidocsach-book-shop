@@ -1,6 +1,8 @@
 from app.extensions import db
 from app.models.book_item_model import BookItem
 from app.models.book_detail_model import BookDetail
+from app.models.category_model import Category
+
 from app.services.cloudinary_service import upload_images_to_cloudinary
 
 def create_book_service(data):
@@ -66,3 +68,30 @@ def get_all_books_service():
 def get_book_by_id_service(book_id: str):
     book = BookItem.query.filter_by(id=book_id).first()
     return book.to_dict(include_detail=True) if book else None
+
+
+
+def update_book_category_service(book_id, category_id):
+    book = BookItem.query.get(book_id)
+    if not book:
+        return {"error": "Book not found"}, 404
+
+    category = Category.query.get(category_id)
+    if not category:
+        return {"error": "Category not found"}, 404
+
+    book.category_id = category.id
+    db.session.commit()
+
+    return book.to_dict(include_detail=True, include_category=True), 200
+
+
+def remove_book_category_service(book_id):
+    book = BookItem.query.get(book_id)
+    if not book:
+        return {"error": "Book not found"}, 404
+
+    book.category_id = None
+    db.session.commit()
+
+    return book.to_dict(include_detail=True, include_category=True), 200

@@ -1,5 +1,5 @@
 from flask import Blueprint, request,jsonify
-from app.services.auth_service import register_user_service,login_user_service
+from app.services.auth_service import register_user_service,login_user_service,recovery_password_service
 from flask_jwt_extended import create_access_token,set_access_cookies,get_jwt_identity,get_jwt,unset_jwt_cookies,jwt_required
 
 auth_route = Blueprint("auth", __name__, url_prefix="/auth")
@@ -26,19 +26,30 @@ def login_user():
 
 
 
+
+@auth_route.route("/recoveryPassword", methods=["PUT"])
+def recovery_password_user():
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    email = data.get("email")
+    otp = data.get("otp")
+    new_password = data.get("new_password")
+
+    result, status = recovery_password_service(email, otp, new_password)
+    return jsonify(result), status
+
+
+
+
 @auth_route.route('/token/refresh', methods=['POST'])
 @jwt_required(refresh=True)
-
 def refresh():
+    current_user_id = get_jwt_identity()  # chỉ lấy user_id từ token refresh
 
-    current_user = get_jwt_identity()
-    
-    # Bạn có thể lấy thêm thông tin role từ JWT claims nếu cần
-    claims = get_jwt()
-    role = claims.get("role", "user")  # hoặc mặc định là "user"
+    new_access_token = create_access_token(identity=current_user_id)
 
-    new_access_token = create_access_token(identity=current_user, additional_claims={"role": role})
-    
     resp = jsonify({"refresh": True, "msg": "Access token refreshed successfully"})
     set_access_cookies(resp, new_access_token)
     return resp, 200

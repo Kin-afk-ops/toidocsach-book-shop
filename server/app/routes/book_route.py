@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service
+from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service
 
 book_route = Blueprint("book", __name__)
 
@@ -36,3 +36,22 @@ def get_book(book_id):
     if not book:
         return jsonify({"error": "Book not found"}), 404
     return jsonify(book), 200
+
+
+
+
+@book_route.route("/book/<uuid:book_id>/category", methods=["PUT"])
+def update_book_category(book_id):
+    data = request.get_json()
+    category_id = data.get("category_id")
+    if not category_id:
+        return jsonify({"error": "category_id is required"}), 400
+
+    resp, status = update_book_category_service(book_id, category_id)
+    return jsonify(resp), status
+
+
+@book_route.route("/book/<uuid:book_id>/category", methods=["DELETE"])
+def remove_book_category(book_id):
+    resp, status = remove_book_category_service(book_id)
+    return jsonify(resp), status
