@@ -10,9 +10,16 @@ import {
 interface ChildProps {
   isCounting: boolean;
   setIsCounting: React.Dispatch<React.SetStateAction<boolean>>;
+  otpValue: string;
+  setOtpValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const OtpBlock: React.FC<ChildProps> = ({ isCounting, setIsCounting }) => {
+const OtpBlock: React.FC<ChildProps> = ({
+  isCounting,
+  setIsCounting,
+  otpValue,
+  setOtpValue,
+}) => {
   const [timeLeft, setTimeLeft] = useState(300); // 5 phút = 300 giây
 
   useEffect(() => {
@@ -47,7 +54,12 @@ const OtpBlock: React.FC<ChildProps> = ({ isCounting, setIsCounting }) => {
         </div>
       )}
 
-      <InputOTP maxLength={6} className="flex gap-2">
+      <InputOTP
+        maxLength={6}
+        className="flex gap-2"
+        value={otpValue}
+        onChange={setOtpValue}
+      >
         <InputOTPGroup className="flex gap-2">
           <InputOTPSlot
             index={0}

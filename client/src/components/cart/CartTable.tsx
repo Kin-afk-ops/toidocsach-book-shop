@@ -12,12 +12,10 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Minus, Plus, Trash, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -27,44 +25,69 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/util/formatPrice ";
+import { CartItemInterface } from "@/interface/cart.i";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { useAuthStore } from "@/store/useUserStore";
+import { showError, showSuccess } from "@/util/styles/toast-utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { BookInterface } from "@/interface/book.i";
 
-interface CartInterface {
-  id: string;
-  image: string;
-  title: string;
-  price: number;
-  discountPrice: number;
-  quantity: number;
+interface ChildProps {
+  data: CartItemInterface[];
+  setData: React.Dispatch<React.SetStateAction<CartItemInterface[]>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CartTable = () => {
+const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
+  const user = useAuthStore((state) => state.user);
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<CartInterface[]>([
-    {
-      id: "1",
-      title:
-        "Book A Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae, nostrum. Repellendus veniam quo ipsam tempore non illum aperiam cum quis facere adipisci explicabo, laudantium laborum ipsa omnis, unde sint odio!",
-      image:
-        "https://cdn1.fahasa.com/media/catalog/product//8/9/8935235241015.jpg",
-      price: 100000,
-      discountPrice: 90000,
-      quantity: 2,
-    },
-    {
-      id: "2",
-      title: "Book B",
-      image:
-        "https://cdn1.fahasa.com/media/catalog/product//8/9/8935235241015.jpg",
-      price: 200000,
-      discountPrice: 180000,
-      quantity: 1,
-    },
-  ]);
+  const [deleteMode, setDeleteMode] = useState<boolean>(false);
+  const [bookDelete, setBookDelete] = useState<BookInterface | null>(null);
 
-  const columns: ColumnDef<CartInterface>[] = [
+  const handleDelete = async (): Promise<void> => {
+    if (!bookDelete?.id)
+      return showError("Hệ thống đang lỗi! Xin quý khách hàng thông cảm!");
+    setLoading(true);
+    await axiosInstance
+      .delete(`/cart/${user?.id}/remove?book_id=${bookDelete?.id}`)
+      .then((res) => {
+        const msg = res.data.message || "Item removed successfully!";
+        showSuccess(msg);
+        setData((prevData) =>
+          prevData.filter((data) => {
+            if (data.book) {
+              return data.book.id !== bookDelete.id;
+            }
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+        const errMsg =
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Xoá sách khỏi giỏ hàng thất bại! Hệ thống đang lỗi sẽ sớm khắc phục. Mong khách hàng thông cảm";
+
+        showError(errMsg);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const columns: ColumnDef<CartItemInterface>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -89,36 +112,45 @@ const CartTable = () => {
     },
 
     {
-      accessorKey: "image",
+      id: "image",
       header: `Select All (${data.length} items)`,
-      cell: ({ row }) => (
-        <Image
-          src={row.getValue("image")}
-          alt="image"
-          width={119}
-          height={119}
-          className="object-cover"
-        />
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+
+        return (
+          <Image
+            src={item.book?.images ? item.book.images[0].image_url : ""}
+            alt="image"
+            width={119}
+            height={119}
+            className="object-contain w-[119px] h-[119px]"
+          />
+        );
+      },
     },
     {
       accessorKey: "title",
       header: "",
       cell: ({ row }) => {
-        const item = row.original as CartInterface;
+        const item = row.original;
 
         return (
           <div className="w-[340px] h-[119px] flex flex-col justify-between text-[14px] text-[var(--text)]">
             <p className="whitespace-normal break-words line-clamp-2 text-justify w-full">
-              {item.title}
+              {item.book?.title}
             </p>
 
             <div className=" flex items-center">
               <p className="text-[18px] line-[18px] font-bold">
-                {formatPrice(item.price)}
+                {item?.book?.price && item?.book?.discount
+                  ? formatPrice(
+                      item.book.price -
+                        (item.book.price * item.book.discount) / 100
+                    )
+                  : "0"}
               </p>
               <p className="ml-2 line-through">
-                {formatPrice(item.discountPrice)}{" "}
+                {formatPrice(item.book?.price ?? 0)}
               </p>
             </div>
           </div>
@@ -129,8 +161,8 @@ const CartTable = () => {
       accessorKey: "quantity",
       header: () => <div className="text-center w-full">Quantity</div>,
       cell: ({ row }) => {
-        const item = row.original as CartInterface;
-
+        const item = row.original;
+        const bookQuantity = item.book?.quantity ? item.book?.quantity : 0;
         return (
           <div className="flex items-center justify-center border border-[#ccc] rounded-[5px]">
             {/* Giảm */}
@@ -172,8 +204,7 @@ const CartTable = () => {
             <button
               className="p-1 cursor-pointer"
               onClick={() => {
-                const totalProduct = 10; // giả sử max stock = 10
-                if (item.quantity < totalProduct) {
+                if (item.quantity < bookQuantity) {
                   setData((prev) =>
                     prev.map((p) =>
                       p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
@@ -182,7 +213,9 @@ const CartTable = () => {
                 }
               }}
             >
-              <Plus color={`${item.quantity === 10 ? "gray" : "black"}`} />
+              <Plus
+                color={`${item.quantity === bookQuantity ? "gray" : "black"}`}
+              />
             </button>
           </div>
         );
@@ -193,12 +226,17 @@ const CartTable = () => {
       id: "Subtotal",
       header: () => <div className="text-center w-full">Subtotal</div>,
       cell: ({ row }) => {
-        const item = row.original as CartInterface; // lấy object gốc
-        const subtotal = item.price * item.quantity;
+        const item = row.original; // lấy object gốc
+        let subtotal;
+        if (item.book) {
+          subtotal =
+            (item.book.price - (item.book.price * item.book.discount) / 100) *
+            item.quantity;
+        }
 
         return (
           <div className="text-center text-[18px] font-bold text-[var(--primary)]">
-            {formatPrice(subtotal)}
+            {subtotal && formatPrice(subtotal)}
           </div>
         );
       },
@@ -209,13 +247,19 @@ const CartTable = () => {
       header: "",
       enableHiding: false,
       cell: ({ row }) => {
+        const item = row.original;
+        const book = item.book ? item.book : null;
         return (
           <div className="flex justify-center">
             <Tooltip>
               <TooltipTrigger>
                 <Trash2
                   className="text-[var(--text)] cursor-pointer hover:text-[var(--primary)]"
-                  onClick={() => {}}
+                  onClick={() => {
+                    setBookDelete(book);
+
+                    setDeleteMode(true);
+                  }}
                 />
               </TooltipTrigger>
               <TooltipContent>
@@ -282,12 +326,40 @@ const CartTable = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                😔 Không có sản phẩm nào ở trong giỏ hàng
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+
+      <AlertDialog open={deleteMode} onOpenChange={setDeleteMode}>
+        <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold text-red-600 px-4 py-2">
+              Xóa sản phẩm khỏi giỏ hàng?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-500 px-4 text-justify">
+              Bạn có chắc chắn muốn xóa{" "}
+              <span className="font-medium text-blue-600">
+                {bookDelete?.title}
+              </span>{" "}
+              khỏi giỏ hàng không? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="px-4 py-2">
+            <AlertDialogCancel className="rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-md bg-red-500 text-white hover:bg-red-600 cursor-pointer"
+              onClick={() => bookDelete?.id && handleDelete()}
+            >
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

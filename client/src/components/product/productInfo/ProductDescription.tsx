@@ -2,7 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-const ProductDescription = () => {
+interface ChildProps {
+  description: string | undefined;
+}
+const ProductDescription: React.FC<ChildProps> = ({ description }) => {
   const [fullDescMode, setFullDescMode] = useState<boolean>(false);
   return (
     <div className="mt-4 list-container p-4">
@@ -16,27 +19,9 @@ const ProductDescription = () => {
             fullDescMode ? "max-h-none" : "max-h-[250px]"
           }`}
         >
-          <p className="mb-4">
-            Cuốn sách này kể về mối tình vượt qua hai thế kỷ của thiếu tướng
-            Hoàng Đan và vợ là đại biểu Quốc hội Nguyễn Thị An Vinh. Thương nhau
-            từ thuở đôi mươi, nên duyên vợ chồng, họ cùng nhau đi qua những mốc
-            lịch sử lớn lao của dân tộc: chiến thắng Điện Biên Phủ 1954, Khe
-            Sanh 1968, Quảng Trị 1972, Sài Gòn 1975, biên giới phía Bắc 1979 và
-            1984.
-          </p>
-          <p>
-            Vị tướng trận đi khắp các chiến trường ác liệt, người vợ ở nhà nuôi
-            con và phấn đấu sự nghiệp, thời gian họ ở bên nhau ít ỏi vô cùng. Vì
-            thế họ gửi gắm tâm tình qua những lá thư băng qua bom đạn, vượt các
-            biên giới. Những lá thư trở thành sợi dây buộc chặt tình yêu của hai
-            con người.
-          </p>
-          <p>
-            Hoàng Nam Tiến đã viết thật xúc động về câu chuyện tình yêu tràn đầy
-            trìu mến của ba mẹ, thông qua những lá thư ấy, không chỉ để lưu giữ
-            ký ức riêng của gia đình, mà còn kể lại cho người đọc hôm nay về một
-            thời đại vô cùng anh hùng và tuyệt vời lãng mạn.
-          </p>
+          {description && (
+            <div dangerouslySetInnerHTML={{ __html: description }}></div>
+          )}
         </div>
         {!fullDescMode && (
           <div

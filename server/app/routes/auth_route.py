@@ -53,3 +53,10 @@ def refresh():
     resp = jsonify({"refresh": True, "msg": "Access token refreshed successfully"})
     set_access_cookies(resp, new_access_token)
     return resp, 200
+
+
+@auth_route.route('/logout', methods=['POST'])
+def logout():
+    resp = jsonify({"logout": True, "msg": "Tokens removed"})
+    unset_jwt_cookies(resp)
+    return resp, 200

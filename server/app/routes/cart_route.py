@@ -12,7 +12,7 @@ from app.services.cart_service import (
 cart_route = Blueprint("cart_route", __name__)
 
 
-@cart_route.route("/cart/<user_id>", methods=["GET"])
+@cart_route.route("/cart/<uuid:user_id>", methods=["GET"])
 @require_user
 def get_cart(user_id):
     cart = get_cart_by_user(user_id)
@@ -44,8 +44,7 @@ def update_item(user_id):
 @cart_route.route("/cart/<uuid:user_id>/remove", methods=["DELETE"])
 @require_user
 def remove_item(user_id):
-    data = request.get_json()
-    book_id = data.get("book_id")
+    book_id = request.args.get("book_id")
 
     result, status = remove_from_cart(user_id, book_id)
     return jsonify(result), status

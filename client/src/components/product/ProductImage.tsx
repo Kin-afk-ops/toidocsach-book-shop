@@ -11,22 +11,13 @@ import "lightgallery/css/lg-thumbnail.css";
 // import plugins if you need
 import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgZoom from "lightgallery/plugins/zoom";
+import { BookImage } from "@/interface/book.i";
 
-const images = [
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/b/a/bac_ho_viet_tuyen_ngon_doc_lap_bia_obi.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-  "https://cdn1.fahasa.com/media/catalog/product/z/6/z6879296494675_70a537fe23016622b5f036060d3cad64.jpg",
-];
+interface ChildProps {
+  images: BookImage[];
+}
 
-const ProductImage = () => {
+const ProductImage: React.FC<ChildProps> = ({ images }) => {
   const visibleImages = images.slice(1, images.length);
   const remaining = images.length > 5 ? images.length - 6 : 0;
   const onInit = () => {
@@ -40,30 +31,31 @@ const ProductImage = () => {
         onInit={onInit}
         speed={500}
         plugins={[lgThumbnail, lgZoom]}
-        elementClassNames="flex  justify-between flex-wrap  w-full "
+        elementClassNames="flex gap-2  justify-start flex-wrap  w-full "
       >
         <a
           className="relative w-full h-[376px] cursor-pointer"
-          href={images[0]}
-          data-src={images[0]}
+          href={images[0].image_url}
+          data-src={images[0].image_url}
         >
           <Image
-            src={images[0]}
-            alt="Main product"
+            src={images[0].image_url}
+            alt="Ảnh sản phẩm"
             fill
             className="object-contain"
           />
         </a>
+
         {visibleImages.map((image, index) => (
           <a
-            href={image}
-            data-src={image}
+            href={image.image_url}
+            data-src={image.image_url}
             className={` relative h-[70px] w-[70px] cursor-pointer flex justify-center mt-4 ${
               index < 5 ? "block" : "hidden"
             }`}
             key={index}
           >
-            <Image alt={image} src={image} fill />
+            <Image alt={"Ảnh sản phẩm"} src={image.image_url} fill />
 
             {remaining > 0 && (
               <>

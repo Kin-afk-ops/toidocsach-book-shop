@@ -1,19 +1,18 @@
-from flask_jwt_extended import jwt_required, get_jwt
+# app/utils/decorators.py
 from functools import wraps
-from flask import jsonify
+from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+from flask import abort
 
 def require_user(fn):
+    """
+    Decorator tự động lấy user_id từ JWT và truyền vào route handler
+    """
     @wraps(fn)
-    @jwt_required()
     def wrapper(*args, **kwargs):
-        claims = get_jwt()
-        print(f"[DEBUG] JWT Claims: {claims}")
-
-        user_id = claims.get("sub")  # "sub" là claim mặc định khi tạo JWT (thường lưu user_id)
-        if not user_id:
-            return jsonify({"msg": "Invalid token"}), 401
-
-        # Gắn user_id vào kwargs để route sử dụng
-        kwargs["jwt_user_id"] = user_id
+        # Xác thực JWT
+        verify_jwt_in_request()
+        user_id = get_jwt_identity()  # Lấy từ access token
+        # Inject vào kwargs
+        kwargs["user_id"] = user_id
         return fn(*args, **kwargs)
     return wrapper

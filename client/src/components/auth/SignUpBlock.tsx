@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,20 +14,23 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
-// import { showError, showSuccess } from "@/utils/styles/toast-utils";
-// import { useAuthStore } from "../../../store/authStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PrimaryButton from "../customs/PrimaryButton";
 import OtpBlock from "./OtpBlock";
+import { Eye, EyeClosed } from "lucide-react";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { showError, showSuccess, showWarning } from "@/util/styles/toast-utils";
 
-const SignUpBlock = () => {
-  const router = useRouter();
+interface ChildProps {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setSignInMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  //   const user = useAuthStore((state) => state.user);
-  // const token = useAuthStore((state) => state.token);
-  //   const setUser = useAuthStore((state) => state.setUser);
-  const [loading, setLoading] = useState<boolean>(false);
+const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
+  const [hideConfirmPassword, setHideConfirmPassword] = useState<boolean>(true);
+  const [otpValue, setOtpValue] = useState<string>("");
+
   const [otpMode, setOtpMode] = useState<boolean>(false);
   const [isCounting, setIsCounting] = useState<boolean>(false);
 
@@ -62,33 +64,60 @@ const SignUpBlock = () => {
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
-    // const loginInfo = values;
-    // setLoading(true);
-    // await axiosInstance
-    //   .post("/login", loginInfo)
-    //   .then(async (res) => {
-    //     setLoading(false);
-    //     setUser({
-    //       id: res.data.id,
-    //       username: res.data.username,
-    //       role: res.data.role,
-    //     });
-    //     // await setAuthToken(res.data.access_token);
-    //     showSuccess("Đăng nhập thành công");
-    //     router.push("/");
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     console.log(error);
-    //     showError("Đăng nhập thất bại hãy thử lại");
-    //   });
+    const registerInfo = values;
+    setLoading(true);
+    await axiosInstance
+      .post("/auth/register", {
+        email: registerInfo.email,
+        password: registerInfo.password,
+        otp: otpValue,
+      })
+      .then(async (res) => {
+        const msg = res.data.message || "Sign up successfully!";
+        showSuccess(msg);
+        setSignInMode(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        const errMsg =
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to send OTP";
+
+        showError(errMsg);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     console.log(values);
   };
 
-  const sendOtp = () => {
-    setOtpMode(true);
-    setIsCounting(true);
+  const handleSendOtp = async (): Promise<void> => {
+    setLoading(true);
+    const email = form.getValues("email");
+    if (!email) {
+      showWarning("Please enter your email");
+      return;
+    }
+    await axiosInstance
+      .post("/auth/otp", { email })
+      .then((res) => {
+        const msg = res.data.message || "OTP sent successfully!";
+        showSuccess(msg);
+        setOtpMode(true);
+        setIsCounting(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        const errMsg =
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to send OTP";
+
+        showError(errMsg);
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -99,7 +128,12 @@ const SignUpBlock = () => {
           className="space-y-8 w-full min-w-[300px]"
         >
           {otpMode ? (
-            <OtpBlock isCounting={isCounting} setIsCounting={setIsCounting} />
+            <OtpBlock
+              isCounting={isCounting}
+              setIsCounting={setIsCounting}
+              otpValue={otpValue}
+              setOtpValue={setOtpValue}
+            />
           ) : (
             <>
               <FormField
@@ -128,12 +162,27 @@ const SignUpBlock = () => {
                   <FormItem>
                     <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter Password"
-                        {...field}
-                        type="password"
-                        autoComplete="current-password"
-                      />
+                      <div className="relative w-full">
+                        <Input
+                          placeholder="Enter Password"
+                          {...field}
+                          autoComplete="current-password"
+                          type={hidePassword ? "password" : "text"}
+                          className="pr-10"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => setHidePassword(!hidePassword)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
+                        >
+                          {hidePassword ? (
+                            <EyeClosed size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,12 +198,28 @@ const SignUpBlock = () => {
                       Confirm password
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter confirm password"
-                        {...field}
-                        type="password"
-                        autoComplete="current-confirm-password"
-                      />
+                      <div className="relative w-full">
+                        <Input
+                          placeholder="Enter confirm password"
+                          {...field}
+                          autoComplete="current-confirm-password"
+                          type={hideConfirmPassword ? "password" : "text"}
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setHideConfirmPassword(!hideConfirmPassword)
+                          }
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
+                        >
+                          {hideConfirmPassword ? (
+                            <EyeClosed size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,7 +229,10 @@ const SignUpBlock = () => {
           )}
 
           {!otpMode ? (
-            <PrimaryButton content="Send OTP to Email" handleTodo={sendOtp} />
+            <PrimaryButton
+              content="Send OTP to Email"
+              handleTodo={handleSendOtp}
+            />
           ) : (
             <PrimaryButton content="Sign up" type="submit" />
           )}

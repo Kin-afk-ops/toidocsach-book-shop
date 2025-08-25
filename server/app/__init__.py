@@ -71,6 +71,7 @@ def create_app():
     from app.routes.order_route import order_route
     from app.routes.address_route import address_route
     from app.routes.category_route import category_route
+    from app.routes.user_route import user_route
     # from app.routes.speech_routes import speech_route
 
 
@@ -82,6 +83,8 @@ def create_app():
     app.register_blueprint(cart_route)
     app.register_blueprint(order_route)
     app.register_blueprint(category_route)
+    app.register_blueprint(address_route)
+    app.register_blueprint(user_route)
 
     # app.register_blueprint(speech_route)
 

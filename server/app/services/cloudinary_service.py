@@ -22,5 +22,6 @@ def upload_images_to_cloudinary(files):
             "image_url": result["secure_url"],
             "image_public_id": result["public_id"]
         })
+    images.reverse()
 
     return images

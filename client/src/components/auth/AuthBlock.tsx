@@ -92,7 +92,10 @@ const AuthBlock: React.FC<ChildProps> = ({ mode, setDialogOpenSignIn }) => {
                 </Button>
               </DialogTitle>
             </DialogHeader>
-            <SignUpBlock />
+            <SignUpBlock
+              setLoading={setLoading}
+              setSignInMode={setSignInMode}
+            />
           </>
         )}
       </DialogContent>

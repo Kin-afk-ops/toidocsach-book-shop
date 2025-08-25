@@ -7,8 +7,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BookDetailInterface } from "@/interface/book.i";
 
-const ProductInfoDetail = () => {
+interface ChildProps {
+  bookDetail: BookDetailInterface | undefined;
+  bookId: string;
+}
+
+const ProductInfoDetail: React.FC<ChildProps> = ({ bookDetail, bookId }) => {
   return (
     <div className="mt-4 list-container p-4">
       <h2 className="text-[18px] font-bold">Details</h2>
@@ -19,62 +25,71 @@ const ProductInfoDetail = () => {
               <TableCell className="text-[var(--text)] w-[30%]">
                 Product code
               </TableCell>
-              <TableCell>8935235241015</TableCell>
+              <TableCell>{bookId}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Supplier
               </TableCell>
-              <TableCell>Nhã Nam</TableCell>
+              <TableCell>{bookDetail?.supplier}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Author
               </TableCell>
-              <TableCell>Hoàng Nam Tiến</TableCell>
+              <TableCell>{bookDetail?.author}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Publisher
               </TableCell>
-              <TableCell>Hội Nhà Văn</TableCell>
+              <TableCell>{bookDetail?.publisher}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Publish Year
               </TableCell>
-              <TableCell>2024</TableCell>
+              <TableCell>{bookDetail?.publish_year}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Weight
               </TableCell>
-              <TableCell>330</TableCell>
+              <TableCell>{bookDetail?.weight}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">Size</TableCell>
-              <TableCell>20.5 x 14 x 1.5 cm</TableCell>
+              <TableCell>{bookDetail?.size}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Quantity of Page
               </TableCell>
-              <TableCell>312</TableCell>
+              <TableCell>{bookDetail?.quantity_of_pages}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
                 Book Layout
               </TableCell>
-              <TableCell>Bìa Mềm</TableCell>
+              <TableCell>{bookDetail?.layout}</TableCell>
             </TableRow>
+
+            {bookDetail?.language && (
+              <TableRow className="">
+                <TableCell className="text-[var(--text)] w-[30%]">
+                  Language
+                </TableCell>
+                <TableCell>{bookDetail?.language}</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

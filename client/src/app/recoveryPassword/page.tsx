@@ -19,10 +19,12 @@ import axiosInstance from "@/lib/api/axiosInstance";
 import { showError, showSuccess, showWarning } from "@/util/styles/toast-utils";
 import LoadingScreen from "@/components/loading/LoadingScreen";
 import { useRouter } from "next/navigation";
+import { Eye, EyeClosed } from "lucide-react";
 
 const RecoveryPasswordPage = () => {
   const router = useRouter();
   const [disableInput, setDisableInput] = useState<boolean>(true);
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const formSchema = z.object({
     email: z
@@ -168,13 +170,27 @@ const RecoveryPasswordPage = () => {
                   <FormItem>
                     <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter Password"
-                        {...field}
-                        type="password"
-                        autoComplete="current-password"
-                        disabled={disableInput}
-                      />
+                      <div className="relative w-full">
+                        <Input
+                          placeholder="Enter Password"
+                          {...field}
+                          autoComplete="current-password"
+                          disabled={disableInput}
+                          type={hidePassword ? "password" : "text"}
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setHidePassword(!hidePassword)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 cursor-pointer"
+                        >
+                          {hidePassword ? (
+                            <EyeClosed size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
