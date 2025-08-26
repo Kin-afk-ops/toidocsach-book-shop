@@ -61,6 +61,24 @@ const CartPage = () => {
     }, 0);
   };
 
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      return showWarning(
+        "Your cart is empty. Please add some books before proceeding to checkout."
+      );
+    }
+
+    const checkedItems = cartItems.filter((item) => item.checked);
+
+    if (checkedItems.length === 0) {
+      return showWarning(
+        "Please select at least one product to proceed to checkout."
+      );
+    }
+
+    router.push(`/order/${userId}`);
+  };
+
   return (
     <>
       {loading && <LoadingScreen />}
@@ -102,13 +120,7 @@ const CartPage = () => {
               <PrimaryButton
                 content="Proceed to Checkout"
                 handleTodo={() => {
-                  if (cartItemsPage.length === 0) {
-                    return showWarning(
-                      "Your cart is empty. Please add some books before proceeding to checkout."
-                    );
-                  }
-
-                  router.push(`/order/${userId}`);
+                  handleCheckout();
                 }}
               />
             </div>

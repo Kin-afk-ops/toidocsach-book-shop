@@ -47,7 +47,13 @@ const Header = () => {
   const setCartItems = useCartStore((state) => state.setCartItems);
 
   const setCart = useCartStore((state) => state.setCart);
+  const cart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clear);
+
+  const modalType = useAuthStore((state) => state.modalType);
+  const setModal = useAuthStore((state) => state.setModal);
+  const closeModal = useAuthStore((state) => state.closeModal);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [language, setLanguage] = useState<{
     label: string;
@@ -74,8 +80,6 @@ const Header = () => {
   ];
 
   const [hoverOpen, setHoverOpen] = useState(false);
-  const [dialogOpenSignIn, setDialogOpenSignIn] = useState(false);
-  const [dialogOpenSignUp, setDialogOpenSignUp] = useState(false);
 
   const handleLogout = async (): Promise<void> => {
     setLoading(true);
@@ -83,10 +87,8 @@ const Header = () => {
       .post("/auth/logout")
       .then(() => {
         logout();
-        router.push("/");
-        setDialogOpenSignIn(false);
-        setDialogOpenSignUp(false);
         clearCart();
+        router.push("/");
         showSuccess("Đã đăng xuất tài khoản");
       })
       .catch((error) => {
@@ -98,27 +100,33 @@ const Header = () => {
 
   useEffect(() => {
     const fetchCart = async (): Promise<void> => {
-      if (user) {
-        try {
+      try {
+        if (user) {
           await new Promise((resolve) => setTimeout(resolve, 800));
 
           const res = await axiosInstance.get(`/cart/${user.id}`);
-          setCart(res.data);
-          setCartItems(
-            res.data.items.map((item: CartItemInterface) => ({
-              ...item,
-              checked: false,
-            }))
-          );
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
+          if (!cart) {
+            setCart(res.data);
+          }
+
+          if (cartItems.length === 0) {
+            setCartItems(
+              res.data.items.map((item: CartItemInterface) => ({
+                ...item,
+                checked: false,
+              }))
+            );
+          }
         }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCart();
-  }, [user, setCartItems, setCart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <>
@@ -483,7 +491,7 @@ const Header = () => {
                       <ShoppingCart color="#646464" className="mb-1 " />
                       My Cart
                     </div>
-                    {cartItems && (
+                    {cartItems.length > 0 && (
                       <Badge
                         className="h-4 min-w-4 rounded-full px-1 font-mono tabular-nums absolute top-[-5px] right-[-2px]"
                         variant="destructive"
@@ -505,7 +513,7 @@ const Header = () => {
                   <div className="w-full h-[1px] bg-[#ddd] my-4"></div>
 
                   <div className=" w-full  max-h-[calc(100vh-200px)]  overflow-y-auto">
-                    {cartItems ? (
+                    {cartItems.length > 0 ? (
                       cartItems.map((cartItem) => (
                         <Link
                           key={cartItem.id}
@@ -555,7 +563,7 @@ const Header = () => {
                     )}
                   </div>
 
-                  {cartItems && (
+                  {cartItems.length > 0 && (
                     <div className="">
                       <PrimaryButton
                         content="Xem giỏ hàng"
@@ -598,37 +606,19 @@ const Header = () => {
               ) : (
                 <DropdownMenuContent className="w-[200px] px-4 py-2">
                   <div className="flex flex-col justify-between  gap-4">
-                    <Dialog
-                      open={dialogOpenSignIn}
-                      onOpenChange={(v) => setDialogOpenSignIn(v)}
+                    <Button
+                      className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] rounded-lg text-white transition-colors cursor-pointer"
+                      onClick={() => setModal("signin")}
                     >
-                      <DialogTrigger asChild>
-                        <Button className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] rounded-lg text-white transition-colors cursor-pointer">
-                          <span>Sign In</span>
-                        </Button>
-                      </DialogTrigger>
-
-                      <AuthBlock
-                        mode={true}
-                        setDialogOpenSignIn={setDialogOpenSignIn}
-                      />
-                    </Dialog>
-
-                    <Dialog
-                      open={dialogOpenSignUp}
-                      onOpenChange={(v) => setDialogOpenSignUp(v)}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[#e11d48] rounded-lg bg-white text-[#e11d48]
+                      <span>Sign In</span>
+                    </Button>
+                    <Button
+                      onClick={() => setModal("signup")}
+                      className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[#e11d48] rounded-lg bg-white text-[#e11d48]
              hover:scale-105 hover:bg-white transition-transform duration-300 ease-in-out cursor-pointer"
-                        >
-                          <span>Sign up</span>
-                        </Button>
-                      </DialogTrigger>
-
-                      <AuthBlock mode={false} />
-                    </Dialog>
+                    >
+                      <span>Sign up</span>
+                    </Button>
                   </div>
                 </DropdownMenuContent>
               )}
@@ -678,6 +668,20 @@ const Header = () => {
           </div>
         </div>
       </header>
+
+      <Dialog
+        open={modalType === "signin"}
+        onOpenChange={(v) => (v ? setModal("signin") : closeModal())}
+      >
+        <AuthBlock mode={true} />
+      </Dialog>
+
+      <Dialog
+        open={modalType === "signup"}
+        onOpenChange={(v) => (v ? setModal("signup") : closeModal())}
+      >
+        <AuthBlock mode={false} />
+      </Dialog>
     </>
   );
 };

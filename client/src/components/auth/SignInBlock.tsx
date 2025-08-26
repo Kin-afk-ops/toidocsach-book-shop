@@ -70,7 +70,9 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
         });
 
         showSuccess("Đăng nhập thành công");
-        router.push("/");
+        if (onClose) {
+          onClose();
+        }
       })
       .catch((error) => {
         setLoading(false);
@@ -78,8 +80,6 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
         showError("Đăng nhập thất bại hãy thử lại");
       })
       .finally(() => setLoading(false));
-
-    console.log(values);
   };
 
   return (

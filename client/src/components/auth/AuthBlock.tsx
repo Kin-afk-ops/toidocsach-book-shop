@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import SignInBlock from "./SignInBlock";
 import SignUpBlock from "./SignUpBlock";
 import LoadingScreen from "../loading/LoadingScreen";
+import { useAuthStore } from "@/store/useUserStore";
 
 interface ChildProps {
   mode: boolean;
@@ -20,6 +21,9 @@ interface ChildProps {
 const AuthBlock: React.FC<ChildProps> = ({ mode, setDialogOpenSignIn }) => {
   const [signInMode, setSignInMode] = useState<boolean>(mode);
   const [loading, setLoading] = useState<boolean>(false);
+
+  // store
+  const closeModal = useAuthStore((state) => state.closeModal);
 
   return (
     <>
@@ -59,12 +63,7 @@ const AuthBlock: React.FC<ChildProps> = ({ mode, setDialogOpenSignIn }) => {
                 </Button>
               </DialogTitle>
             </DialogHeader>
-            {setDialogOpenSignIn && (
-              <SignInBlock
-                onClose={() => setDialogOpenSignIn(false)}
-                setLoading={setLoading}
-              />
-            )}
+            <SignInBlock onClose={closeModal} setLoading={setLoading} />
           </>
         ) : (
           <>

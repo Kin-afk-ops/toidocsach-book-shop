@@ -26,8 +26,10 @@ const ProductAction: React.FC<ChildProps> = ({
   const user = useAuthStore((state) => state.user);
   const setCart = useCartStore((state) => state.setCart);
   const setCartItems = useCartStore((state) => state.setCartItems);
+
   const quantityProduct = useQuantityProduct((state) => state.quantityProduct);
   const quantityProductClear = useQuantityProduct((state) => state.clear);
+  const setModal = useAuthStore((state) => state.setModal);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleAddToCart = async (): Promise<void> => {
@@ -37,6 +39,11 @@ const ProductAction: React.FC<ChildProps> = ({
 
     if ((quantityProduct?.quantity ?? 0) > bookQuantity) {
       return showWarning("Số lượng bạn nhập đã vượt quá số lượng sách hiện có");
+    }
+
+    if (!user) {
+      showWarning("Hãy đăng nhập để mua hàng");
+      return setModal("signin");
     }
     setLoading(true);
     await axiosInstance
