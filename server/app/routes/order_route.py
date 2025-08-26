@@ -35,13 +35,26 @@ def checkout(user_id):
         "items": [
             {"book_id": "uuid1", "quantity": 2},
             {"book_id": "uuid2", "quantity": 1}
-        ]
+        ],
+        "receiver": {
+            "fullname": "Nguyen Van A",
+            "phone": "0912345678",
+            "note": "Giao buổi tối giúp mình"
+        },
+        "address": {
+            "country": "Vietnam",
+            "province": "Hà Nội",
+            "ward": "Ba Đình",
+            "address": "123 Đường A"
+        }
     }
     """
     data = request.get_json()
     client_items = data.get("items", [])
+    receiver_data = data.get("receiver", {})
+    address_data = data.get("address", {})
 
-    order, status = checkout_cart(user_id, client_items)
+    order, status = checkout_cart(user_id, client_items, receiver_data, address_data)
     return jsonify(order), status
 
 

@@ -16,8 +16,7 @@ def get_order_by_id(order_id):
     return order.to_dict(include_items=True)
 
 
-def checkout_cart(user_id, client_items):
-  
+def checkout_cart(user_id, client_items, receiver_data, address_data):
     if not client_items:
         return {"error": "No items to checkout"}, 400
 
@@ -25,24 +24,34 @@ def checkout_cart(user_id, client_items):
     if not cart or not cart.items:
         return {"error": "Cart is empty"}, 400
 
-    order = Order(user_id=user_id)
+    # Tạo order kèm thông tin người nhận + địa chỉ
+    order = Order(
+        user_id=user_id,
+        fullname=receiver_data.get("fullname"),
+        phone=receiver_data.get("phone"),
+        note=receiver_data.get("note"),
+        payment_method=receiver_data.get("payment_method"),
+        country=address_data.get("country", "Vietnam"),
+        province=address_data.get("province"),
+        ward=address_data.get("ward"),
+        address=address_data.get("address"),
+        status="pending"
+    )
+
     total_amount = 0
 
-    # Duyệt các item client muốn checkout
     for item_data in client_items:
         book_id = item_data.get("book_id")
         quantity = item_data.get("quantity", 1)
 
-        # Kiểm tra item trong cart
         cart_item = CartItem.query.filter_by(cart_id=cart.id, book_id=book_id).first()
         if not cart_item:
-            continue  # bỏ qua item không tồn tại trong cart
+            continue
 
         book = cart_item.book_item
         if not book:
             continue
 
-        # Giới hạn quantity <= số lượng trong cart
         quantity = min(quantity, cart_item.quantity)
 
         order_item = OrderItem(
@@ -53,23 +62,19 @@ def checkout_cart(user_id, client_items):
         order.items.append(order_item)
         total_amount += float(book.price) * quantity
 
-        # Cập nhật cart: trừ số lượng đã checkout
         cart_item.quantity -= quantity
         if cart_item.quantity <= 0:
             db.session.delete(cart_item)
 
     order.amount = total_amount
-
     db.session.add(order)
     db.session.commit()
 
-    # Nếu cart rỗng sau checkout, xóa cart
     if not cart.items:
         db.session.delete(cart)
         db.session.commit()
 
     return order.to_dict(include_items=True), 200
-
 
 
 def update_order_status(order_id, status_value):
