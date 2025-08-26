@@ -10,6 +10,7 @@ import axiosInstance from "@/lib/api/axiosInstance";
 import { showError, showSuccess, showWarning } from "@/util/styles/toast-utils";
 import { useState } from "react";
 import LoadingScreen from "../loading/LoadingScreen";
+import { useCartStore } from "@/store/useCartStore";
 
 interface ChildProps {
   images: BookImage[];
@@ -23,6 +24,8 @@ const ProductAction: React.FC<ChildProps> = ({
   bookQuantity,
 }) => {
   const user = useAuthStore((state) => state.user);
+  const setCart = useCartStore((state) => state.setCart);
+  const setCartItems = useCartStore((state) => state.setCartItems);
   const quantityProduct = useQuantityProduct((state) => state.quantityProduct);
   const quantityProductClear = useQuantityProduct((state) => state.clear);
   const [loading, setLoading] = useState<boolean>(false);
@@ -42,7 +45,12 @@ const ProductAction: React.FC<ChildProps> = ({
         quantity: quantityProduct?.quantity ? quantityProduct?.quantity : 1,
       })
       .then((res) => {
-        console.log(res.data);
+        const updatedCart = res.data;
+        const updatedCartItems = updatedCart.items;
+
+        setCart(updatedCart);
+        setCartItems(updatedCartItems);
+
         showSuccess("Đã thêm sách vào giỏ hàng");
         quantityProductClear();
       })

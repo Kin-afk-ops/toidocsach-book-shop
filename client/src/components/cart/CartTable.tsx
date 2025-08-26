@@ -28,7 +28,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/util/formatPrice ";
-import { CartItemInterface } from "@/interface/cart.i";
+import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { useAuthStore } from "@/store/useUserStore";
 import { showError, showSuccess } from "@/util/styles/toast-utils";
@@ -43,15 +43,24 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { BookInterface } from "@/interface/book.i";
+import { useCartStore } from "@/store/useCartStore";
+import Link from "next/link";
+import formatSlug from "@/util/formatSlug";
 
 interface ChildProps {
   data: CartItemInterface[];
-  setData: React.Dispatch<React.SetStateAction<CartItemInterface[]>>;
+  setData: React.Dispatch<React.SetStateAction<CartItemWithCheck[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
   const user = useAuthStore((state) => state.user);
+  const cartItems = useCartStore((state) => state.cartItems);
+  const setCartItems = useCartStore((state) => state.setCartItems);
+  const toggleAllCheck = useCartStore((state) => state.toggleAllCheck);
+  const toggleItemCheck = useCartStore((state) => state.toggleItemCheck);
+  const clearCart = useCartStore((state) => state.clear);
+
   const [rowSelection, setRowSelection] = useState({});
   const [deleteMode, setDeleteMode] = useState<boolean>(false);
   const [bookDelete, setBookDelete] = useState<BookInterface | null>(null);
@@ -65,12 +74,22 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
       .then((res) => {
         const msg = res.data.message || "Item removed successfully!";
         showSuccess(msg);
+
+        if (cartItems) {
+          const updatedItems = cartItems.filter(
+            (item) => item.book?.id !== bookDelete.id
+          );
+
+          if (updatedItems.length === 0) {
+            clearCart(); // xoá hết thì clear store
+          } else {
+            setCartItems(updatedItems); // update lại store
+          }
+        }
+
+        // đồng bộ thêm với state local trong component (nếu có)
         setData((prevData) =>
-          prevData.filter((data) => {
-            if (data.book) {
-              return data.book.id !== bookDelete.id;
-            }
-          })
+          prevData.filter((data) => data.book?.id !== bookDelete.id)
         );
       })
       .catch((error) => {
@@ -87,26 +106,38 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
       });
   };
 
-  const columns: ColumnDef<CartItemInterface>[] = [
+  const columns: ColumnDef<CartItemWithCheck>[] = [
     {
       id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
+      header: ({ table }) => {
+        {
+          const allChecked = cartItems?.every((item) => item.checked) ?? false;
+          const someChecked =
+            cartItems?.some((item) => item.checked) && !allChecked;
+          return (
+            <Checkbox
+              checked={
+                allChecked ? true : someChecked ? "indeterminate" : false
+              }
+              onCheckedChange={(value) => toggleAllCheck(!!value)}
+              aria-label="Select all"
+              className="cursor-pointer"
+            />
+          );
+        }
+      },
+      cell: ({ row }) => {
+        const item = row.original;
+
+        return (
+          <Checkbox
+            checked={item.checked}
+            onCheckedChange={() => toggleItemCheck(item.book?.id || "")}
+            aria-label="Select row"
+            className="cursor-pointer"
+          />
+        );
+      },
       enableSorting: false,
       enableHiding: false,
     },
@@ -136,9 +167,14 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
         return (
           <div className="w-[340px] h-[119px] flex flex-col justify-between text-[14px] text-[var(--text)]">
-            <p className="whitespace-normal break-words line-clamp-2 text-justify w-full">
+            <Link
+              href={`/product/${formatSlug(
+                item.book ? item.book?.title : ""
+              )}.html?q=${item.book ? item.book?.id : ""}`}
+              className="text-base-normal break-words line-clamp-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
+            >
               {item.book?.title}
-            </p>
+            </Link>
 
             <div className=" flex items-center">
               <p className="text-[18px] line-[18px] font-bold">
@@ -163,6 +199,39 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
       cell: ({ row }) => {
         const item = row.original;
         const bookQuantity = item.book?.quantity ? item.book?.quantity : 0;
+
+        // Hàm cập nhật số lượng
+        const updateQuantity = async (newQuantity: number) => {
+          // Cập nhật local
+          setData((prev) =>
+            prev.map((p) =>
+              p.id === item.id ? { ...p, quantity: newQuantity } : p
+            )
+          );
+
+          // Cập nhật store
+          setCartItems(
+            cartItems.map((p) =>
+              p.id === item.id ? { ...p, quantity: newQuantity } : p
+            )
+          );
+
+          if (user) {
+            setLoading(true);
+            try {
+              await axiosInstance.put(`/cart/${user?.id}/update`, {
+                book_id: item.book?.id,
+                quantity: newQuantity,
+              });
+            } catch (error) {
+              console.error("Update quantity error:", error);
+              showError("Cập nhật số lượng thất bại");
+            } finally {
+              setLoading(false);
+            }
+          }
+        };
+
         return (
           <div className="flex items-center justify-center border border-[#ccc] rounded-[5px]">
             {/* Giảm */}
@@ -170,11 +239,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               className="p-1 cursor-pointer"
               onClick={() => {
                 if (item.quantity > 1) {
-                  setData((prev) =>
-                    prev.map((p) =>
-                      p.id === item.id ? { ...p, quantity: p.quantity - 1 } : p
-                    )
-                  );
+                  updateQuantity(item.quantity - 1);
                 }
               }}
             >
@@ -189,13 +254,10 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d*$/.test(value)) {
-                  setData((prev) =>
-                    prev.map((p) =>
-                      p.id === item.id
-                        ? { ...p, quantity: value === "" ? 0 : Number(value) }
-                        : p
-                    )
-                  );
+                  const parsed = value === "" ? 0 : Number(value);
+                  if (parsed >= 1 && parsed <= bookQuantity) {
+                    updateQuantity(parsed);
+                  }
                 }
               }}
             />
@@ -205,11 +267,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               className="p-1 cursor-pointer"
               onClick={() => {
                 if (item.quantity < bookQuantity) {
-                  setData((prev) =>
-                    prev.map((p) =>
-                      p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
-                    )
-                  );
+                  updateQuantity(item.quantity + 1);
                 }
               }}
             >
@@ -273,7 +331,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
   ];
 
   const table = useReactTable({
-    data,
+    data: cartItems,
     columns,
     autoResetPageIndex: false,
 

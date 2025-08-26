@@ -17,3 +17,7 @@ export interface CartInterface {
   updated_at: string; // ISO string
   items?: CartItemInterface[]; // nếu include_items = true
 }
+
+export interface CartItemWithCheck extends CartItemInterface {
+  checked: boolean;
+}

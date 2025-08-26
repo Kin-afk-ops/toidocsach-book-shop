@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HoverCard,
   HoverCardContent,
@@ -25,14 +25,7 @@ import {
 import PrimaryButton from "../customs/PrimaryButton";
 import TransparentButton from "../customs/TransparentButton";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import AuthBlock from "../auth/AuthBlock";
 import { Badge } from "../ui/badge";
 import { useRouter } from "next/navigation";
@@ -40,12 +33,22 @@ import { useAuthStore } from "@/store/useUserStore";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { showError, showSuccess } from "@/util/styles/toast-utils";
 import LoadingScreen from "../loading/LoadingScreen";
+import { useCartStore } from "@/store/useCartStore";
+import formatSlug from "@/util/formatSlug";
+import { formatPrice } from "@/util/formatPrice ";
+import { CartItemInterface } from "@/interface/cart.i";
 
 const Header = () => {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const cartItems = useCartStore((state) => state.cartItems);
+  const setCartItems = useCartStore((state) => state.setCartItems);
+
+  const setCart = useCartStore((state) => state.setCart);
+  const clearCart = useCartStore((state) => state.clear);
+  const [loading, setLoading] = useState<boolean>(true);
   const [language, setLanguage] = useState<{
     label: string;
     value: string;
@@ -83,6 +86,7 @@ const Header = () => {
         router.push("/");
         setDialogOpenSignIn(false);
         setDialogOpenSignUp(false);
+        clearCart();
         showSuccess("Đã đăng xuất tài khoản");
       })
       .catch((error) => {
@@ -91,6 +95,30 @@ const Header = () => {
       })
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    const fetchCart = async (): Promise<void> => {
+      if (user) {
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+
+          const res = await axiosInstance.get(`/cart/${user.id}`);
+          setCart(res.data);
+          setCartItems(
+            res.data.items.map((item: CartItemInterface) => ({
+              ...item,
+              checked: false,
+            }))
+          );
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchCart();
+  }, [user, setCartItems, setCart]);
 
   return (
     <>
@@ -455,65 +483,90 @@ const Header = () => {
                       <ShoppingCart color="#646464" className="mb-1 " />
                       My Cart
                     </div>
-                    <Badge
-                      className="h-4 min-w-4 rounded-full px-1 font-mono tabular-nums absolute top-[-5px] right-[-2px]"
-                      variant="destructive"
-                    >
-                      99
-                    </Badge>
+                    {cartItems && (
+                      <Badge
+                        className="h-4 min-w-4 rounded-full px-1 font-mono tabular-nums absolute top-[-5px] right-[-2px]"
+                        variant="destructive"
+                      >
+                        {cartItems.length}
+                      </Badge>
+                    )}
                   </button>
                 </HoverCardTrigger>
                 <HoverCardContent align="end" className="w-[360px]">
                   <div className="flex text-[16px] justify-between">
                     <div className="text-[#0D0E0F] flex items-center font-bold">
                       <ShoppingCart size={16} className="mr-2 font-bold" />
-                      <span>{"Giỏ hàng (3)"}</span>
+                      <span>{`Giỏ hàng (${
+                        cartItems ? cartItems.length : "0"
+                      })`}</span>
                     </div>
                   </div>
                   <div className="w-full h-[1px] bg-[#ddd] my-4"></div>
 
                   <div className=" w-full  max-h-[calc(100vh-200px)]  overflow-y-auto">
-                    <Link
-                      href={"/"}
-                      className="flex w-full gap-1 min-w-0  cursor-pointer py-4"
-                    >
-                      <div className="">
-                        <Image
-                          src={
-                            "https://cdn1.fahasa.com/media/catalog/product//8/9/8935235241015.jpg"
+                    {cartItems ? (
+                      cartItems.map((cartItem) => (
+                        <Link
+                          key={cartItem.id}
+                          href={`/product/${formatSlug(
+                            cartItem.book ? cartItem.book?.title : ""
+                          )}.html?q=${cartItem.book ? cartItem.book?.id : ""}`}
+                          className="flex w-full gap-1 min-w-0  cursor-pointer py-4"
+                        >
+                          <div className="">
+                            <Image
+                              src={
+                                cartItem.book
+                                  ? cartItem.book.images[0].image_url
+                                  : ""
+                              }
+                              alt=""
+                              width={68}
+                              height={68}
+                              style={{ objectFit: "contain" }}
+                            />
+                          </div>
+                          <div className="text-[14px] text-[var(--text)] w-[280px] min-w-0 ml-1">
+                            <p className=" truncate">
+                              {cartItem.book ? cartItem.book.title : ""}
+                            </p>
+
+                            <div className=" text-justify w-full flex">
+                              <p className="mr-2 font-bold">
+                                {cartItem.book
+                                  ? formatPrice(
+                                      cartItem.book.price -
+                                        (cartItem.book.price *
+                                          cartItem.book.discount) /
+                                          100
+                                    )
+                                  : "0"}
+                              </p>
+                              <p>x{cartItem.quantity && cartItem.quantity}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="w-full flex justify-center text-[var(--text)] pb-6">
+                        No Propducts
+                      </div>
+                    )}
+                  </div>
+
+                  {cartItems && (
+                    <div className="">
+                      <PrimaryButton
+                        content="Xem giỏ hàng"
+                        handleTodo={() => {
+                          if (user) {
+                            router.push(`/cart/${user?.id}`);
                           }
-                          alt="anh chup"
-                          width={68}
-                          height={68}
-                          style={{ objectFit: "cover" }}
-                        />
-                      </div>
-                      <div className="text-[14px] text-[var(--text)] w-[280px] min-w-0 ml-1">
-                        <p className=" truncate">
-                          Nâng trình ngoại ngữ cùng Lorem, ipsum dolor sit amet
-                          consectetur adipisicing elit. Vero, doloremque tempore
-                          qui quam eius enim sint id aliquam, vitae saepe quasi
-                          maiores!
-                        </p>
-
-                        <div className=" text-justify w-full flex">
-                          <p className="mr-2 font-bold">11200</p>
-                          <p>x1</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  <div className="">
-                    <PrimaryButton
-                      content="Xem giỏ hàng"
-                      handleTodo={() => {
-                        if (user) {
-                          router.push(`/cart/${user?.id}`);
-                        }
-                      }}
-                    />
-                  </div>
+                        }}
+                      />
+                    </div>
+                  )}
                 </HoverCardContent>
               </HoverCard>
             </div>
