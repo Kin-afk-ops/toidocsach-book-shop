@@ -5,7 +5,7 @@ from app.models.book_item_model import BookItem
 
 
 def get_orders_by_user(user_id):
-    orders = Order.query.filter_by(user_id=user_id).all()
+    orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
     return [order.to_dict(include_items=True) for order in orders]
 
 
@@ -73,8 +73,15 @@ def checkout_cart(user_id, client_items, receiver_data, address_data):
     if not cart.items:
         db.session.delete(cart)
         db.session.commit()
+        current_cart = None
+    else:
+        current_cart = cart.to_dict(include_items=True)
 
-    return order.to_dict(include_items=True), 200
+
+    return {
+        "message": "Đã tạo đơn hàng thành công",
+        "cart": current_cart
+    }, 200
 
 
 def update_order_status(order_id, status_value):
@@ -85,3 +92,26 @@ def update_order_status(order_id, status_value):
     order.status = status_value
     db.session.commit()
     return order.to_dict(include_items=True), 200
+
+
+
+def update_order_canceled_status(order_id, user_id):
+    order = Order.query.get(order_id)
+    if not order:
+        return {"error": "Order not found"}, 404
+
+    # Kiểm tra đơn hàng có thuộc user_id này không (bảo mật)
+    if str(order.user_id) != str(user_id):
+        return {"error": "Permission denied"}, 403
+
+    # Cập nhật trạng thái thành canceled
+    order.status = "cancelled"
+    db.session.commit()
+
+    # Lấy danh sách orders mới của user (không bao gồm order_id này)
+    orders = (
+        Order.query.filter(Order.user_id == user_id, Order.id != order_id)
+        .all()
+    )
+
+    return [o.to_dict(include_items=True) for o in orders], 200

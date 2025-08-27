@@ -29,16 +29,20 @@ import { formatPrice } from "@/util/formatPrice ";
 import { showError, showSuccess } from "@/util/styles/toast-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const OrderPage = () => {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const userId = params.id;
   const [loading, setLoading] = useState<boolean>(true);
   const cartItems = useCartStore((state) => state.cartItems);
+  const setCartItems = useCartStore((state) => state.setCartItems);
+  const setCart = useCartStore((state) => state.setCart);
+  const clear = useCartStore((state) => state.clear);
 
   const formSchema = z.object({
     fullname: z.string().nonempty({ message: "Họ tên không được để trống." }),
@@ -96,12 +100,26 @@ const OrderPage = () => {
         address: {
           country: formInfo.country,
           province: formInfo.province,
-          wards: formInfo.ward,
+          ward: formInfo.ward,
           address: formInfo.address,
         },
       })
-      .then(() => {
-        showSuccess("Đặt hàng thành công");
+      .then((res) => {
+        showSuccess(res?.data.message);
+        const cart = res?.data.cart;
+
+        if (cart) {
+          setCart(cart);
+          setCartItems(
+            res.data.items.map((item: CartItemInterface) => ({
+              ...item,
+              checked: false,
+            }))
+          );
+        } else {
+          clear();
+        }
+        router.push(`/myOrder/${userId}`);
       })
       .catch((error) => {
         console.log(error);

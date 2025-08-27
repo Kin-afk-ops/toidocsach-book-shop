@@ -1,6 +1,7 @@
 "use client";
 import {
   Bell,
+  BookA,
   ChartBarBig,
   NotebookPen,
   Search,
@@ -578,6 +579,24 @@ const Header = () => {
                 </HoverCardContent>
               </HoverCard>
             </div>
+
+            {user && (
+              <div className="text-[12px] flex flex-col cursor-pointer items-center leading-relaxed text-[var(--text)]">
+                <button
+                  className="text-[12px]  cursor-pointer leading-relaxed text-[var(--text)] relative"
+                  onClick={() => {
+                    if (user) {
+                      router.push(`/myOrder/${user?.id}`);
+                    }
+                  }}
+                >
+                  <div className="flex flex-col  items-center">
+                    <BookA color="#646464" className="mb-1 " />
+                    My Order
+                  </div>
+                </button>
+              </div>
+            )}
 
             <DropdownMenu
               open={hoverOpen}

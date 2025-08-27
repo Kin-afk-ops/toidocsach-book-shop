@@ -5,7 +5,7 @@ from app.services.order_service import (
     get_orders_by_user,
     get_order_by_id,
     checkout_cart,
-    update_order_status
+    update_order_status,update_order_canceled_status
 )
 
 order_route = Blueprint("order_route", __name__)
@@ -65,3 +65,14 @@ def update_status(order_id):
     status_value = data.get("status")
     order, status = update_order_status(order_id, status_value)
     return jsonify(order), status
+
+
+
+
+@order_route.route("/order/<uuid:order_id>/<uuid:user_id>/cancelled", methods=["PUT"])
+@require_user
+def update_canceled_status(order_id, user_id):
+    # Gọi service cập nhật trạng thái
+    result, status_code = update_order_canceled_status(order_id, user_id)
+
+    return jsonify(result), status_code
