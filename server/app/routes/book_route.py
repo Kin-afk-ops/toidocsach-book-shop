@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service
-
+from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service,get_home_books_service,get_list_books_service,get_books_by_category_service
+import math
 book_route = Blueprint("book", __name__)
 
 @book_route.route("/book", methods=["POST"])
@@ -18,7 +18,7 @@ def add_book():
 
 
 
-@book_route.route("/book", methods=["GET"])
+@book_route.route("/book/all", methods=["GET"])
 def get_all_books():
     try:
         books, status_code = get_all_books_service()
@@ -27,6 +27,48 @@ def get_all_books():
         return jsonify({"error": str(e)}), 500
     
 
+
+
+@book_route.route("/book/home", methods=["GET"])
+def get_home_books():
+    try:
+        books, status_code = get_home_books_service()
+        return jsonify(books), status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+
+
+
+@book_route.route("/book/list", methods=["GET"])
+def get_list_books():
+    try:
+        # Lấy page từ query param, mặc định là 1
+        page = request.args.get("page", 1, type=int)
+        books, total_pages, status_code = get_list_books_service(page)
+        return jsonify({
+            "books": books,
+            "total_pages": total_pages,
+            "current_page": page
+        }), status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@book_route.route("/book/category/<uuid:category_id>", methods=["GET"])
+def get_books_by_category(category_id):
+    try:
+        # Lấy page từ query param (mặc định = 1)
+        page = request.args.get("page", 1, type=int)
+        books, total_pages, status_code = get_books_by_category_service(category_id, page)
+        return jsonify({
+            "books": books,
+            "total_pages": total_pages,
+            "current_page": page
+        }), status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 
 # GET /book/<uuid:book_id>

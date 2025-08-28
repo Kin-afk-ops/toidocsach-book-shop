@@ -4,16 +4,39 @@ import Slider from "@/components/slider/Slider";
 import { BookItemInterface } from "@/interface/book.i";
 
 export default async function Home() {
-  const bookResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/book`
-  );
-  const bookData: BookItemInterface[] = await bookResponse.json();
+  let books: BookItemInterface[] | null = null;
+  let hasError = false;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/book/home`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch books");
+    }
+
+    books = (await res.json()) as BookItemInterface[];
+  } catch (error) {
+    console.error("Lỗi khi tải sách:", error);
+    hasError = true;
+  }
+
   return (
-    <div className="">
+    <div>
       <Slider />
       <Categories />
-      <NewProducts products={bookData} />
-      {/* <HotProducts /> */}
+
+      {hasError ? (
+        <div className="p-4 text-center text-red-500 font-medium">
+          🚨 Không thể tải dữ liệu sách. Vui lòng thử lại sau.
+        </div>
+      ) : (
+        <NewProducts products={books ?? []} />
+      )}
     </div>
   );
 }

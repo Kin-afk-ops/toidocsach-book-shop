@@ -29,11 +29,6 @@ const Footer = () => {
               <span className="font-bold">Toidocsach</span> accepts online
               orders and delivers to your door.
             </p>
-            <div className="flex space-x-5 text-2xl">
-              <Facebook className="cursor-pointer" />
-              <Youtube className="cursor-pointer" />
-              <Twitter className="cursor-pointer" />
-            </div>
           </div>
 
           {/* Right */}
@@ -82,19 +77,19 @@ const Footer = () => {
                       100% Refund
                     </Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link
                       href="/payment-methods"
                       className="hover:text-primary transition-colors"
                     >
                       Cash, VNPAY & MOMO
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
 
               {/* Account */}
-              <FooterAccount />
+              {/* <FooterAccount /> */}
             </div>
 
             {/* Contact */}
@@ -103,15 +98,36 @@ const Footer = () => {
               <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <li className="flex items-center space-x-2">
                   <MapPin />
-                  <span>4/9A, Mau Than, Ninh Kieu, Can Tho</span>
+                  <a
+                    href={`https://www.google.com/maps?q=${encodeURIComponent(
+                      "Hẻm 4, đường Mậu Thân, phường Ninh Kiều, thành phố Cần Thơ"
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline hover:text-[var(--primary)] transition-colors"
+                  >
+                    4/9A, Mau Than, Ninh Kieu, Can Tho
+                  </a>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Mail />
-                  <span>linhb2110130@student.ctu.edu.vn</span>
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=linhb2110130@student.ctu.edu.vn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline hover:text-[var(--primary)] transition-colors"
+                  >
+                    linhb2110130@student.ctu.edu.vn
+                  </a>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Phone />
-                  <span>(+84) 589443320</span>
+                  <a
+                    href="tel:+84589443320"
+                    className="hover:underline hover:text-[var(--primary)] transition-colors"
+                  >
+                    (+84) 589443320
+                  </a>
                 </li>
               </ul>
             </div>

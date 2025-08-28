@@ -2,7 +2,7 @@ from app.extensions import db
 from app.models.book_item_model import BookItem
 from app.models.book_detail_model import BookDetail
 from app.models.category_model import Category
-
+import math
 from app.services.cloudinary_service import upload_images_to_cloudinary
 
 def create_book_service(data):
@@ -25,7 +25,8 @@ def create_book_service(data):
         price=price,
         discount=data.get("discount", 0.0),
         quantity=data.get("quantity", 0),
-        sold_count=data.get("sold_count", 0)
+        sold_count=data.get("sold_count", 0),
+        category_id=data.get("category_id","")
     )
 
     # Tạo BookDetail
@@ -63,6 +64,61 @@ def get_all_books_service():
     except Exception as e:
         raise e
     
+
+def get_home_books_service():
+    try:
+        books = (
+            BookItem.query
+            .order_by(BookItem.created_at.desc())
+            .limit(10)  # chỉ lấy tối đa 10 sản phẩm mới
+            .all()
+        )
+        return [book.to_dict() for book in books], 200
+    except Exception as e:
+        raise e
+
+
+def get_list_books_service(page: int, per_page: int = 20):
+    try:
+        # Đếm tổng số sách
+        total_books = BookItem.query.count()
+        total_pages = math.ceil(total_books / per_page)
+
+        # Lấy sách theo trang
+        books = (
+            BookItem.query
+            .order_by(BookItem.created_at.desc())
+            .offset((page - 1) * per_page)
+            .limit(per_page)
+            .all()
+        )
+
+        return [book.to_dict() for book in books], total_pages, 200
+    except Exception as e:
+        raise e
+
+
+
+def get_books_by_category_service(category_id, page: int, per_page: int = 20):
+    try:
+        # Đếm tổng số sách trong category này
+        total_books = BookItem.query.filter_by(category_id=category_id).count()
+        total_pages = math.ceil(total_books / per_page) if total_books > 0 else 1
+
+        # Lấy sách theo category + phân trang
+        books = (
+            BookItem.query
+            .filter_by(category_id=category_id)
+            .order_by(BookItem.created_at.desc())
+            .offset((page - 1) * per_page)
+            .limit(per_page)
+            .all()
+        )
+
+        return [book.to_dict() for book in books], total_pages, 200
+    except Exception as e:
+        raise e
+
 
 
 def get_book_by_id_service(book_id: str):

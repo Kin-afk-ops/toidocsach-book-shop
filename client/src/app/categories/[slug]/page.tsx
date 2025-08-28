@@ -1,85 +1,71 @@
+"use client";
 import ListCart from "@/components/list/ListCart";
 import ListPagination from "@/components/list/ListPagination";
-import React from "react";
-const products: Product[] = [
-  {
-    id: 1,
-    name: " Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquid a, officia asperiores doloribus architecto quos! Facilis architecto tempora doloremque, numquam laboriosam, nobis exercitationem explicabo, quam nihil voluptate libero temporibus odit.",
-    price: "120.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 2,
-    name: "Sản phẩm 2",
-    price: "150.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 3,
-    name: "Sản phẩm 3",
-    price: "200.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 4,
-    name: "Sản phẩm 4",
-    price: "90.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 5,
-    name: "Sản phẩm 5",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 6,
-    name: "Sản phẩm 6",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 7,
-    name: "Sản phẩm 7",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 8,
-    name: "Sản phẩm 8",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 9,
-    name: "Sản phẩm 9",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-  {
-    id: 10,
-    name: "Sản phẩm 10",
-    price: "75.000₫",
-    image:
-      "https://cdn1.fahasa.com/media/catalog/product/4/8/4895232519484.jpg",
-  },
-];
+import LoadingScreen from "@/components/loading/LoadingScreen";
+import { BookItemInterface } from "@/interface/book.i";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const ListPage = () => {
+  const searchParams = useSearchParams();
+  const currentCateId = searchParams.get("q");
+  const page = (searchParams.get("page") as string) || "1";
+  const [bookResult, setBookResult] = useState<{
+    books: BookItemInterface[];
+    total_pages: number;
+    current_page: number;
+  }>({
+    books: [],
+    total_pages: 0,
+    current_page: 1,
+  });
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchBookCategories = async (): Promise<void> => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        let res;
+        if (currentCateId) {
+          res = await axiosInstance.get(
+            `/book/category/${currentCateId}?page=${page}`
+          );
+        } else {
+          res = await axiosInstance.get(`/book/list?page=${page}`);
+        }
+
+        setBookResult(res?.data);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookCategories();
+  }, [currentCateId, page]);
+
   return (
-    <div className="list-container">
-      <ListCart products={products} />
-      <ListPagination />
-    </div>
+    <>
+      {loading && <LoadingScreen />}
+      <div className="list-container">
+        {/* Nếu không có sách */}
+        {bookResult.books.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">
+            Không có sản phẩm nào để hiển thị
+          </div>
+        ) : (
+          <>
+            <ListCart bookItems={bookResult.books} />
+            <ListPagination
+              totalPage={bookResult.total_pages}
+              currentPage={bookResult.current_page}
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -36,6 +36,7 @@ def get_category(category_id):
     return jsonify(resp), status
 
 
+
 @category_route.route("/<uuid:category_id>", methods=["PUT"])
 def update_category(category_id):
     data = request.get_json()

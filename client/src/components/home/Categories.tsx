@@ -1,21 +1,23 @@
 import { CategoryInterface } from "@/interface/category.i";
-import { showError } from "@/util/styles/toast-utils";
 import { ChartBarBig } from "lucide-react";
-
 import CategoriesDetail from "./CategoriesDetail";
 
-const Categories = async () => {
-  const resCategories = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/categories`
-  );
+export default async function Categories() {
+  let categories: CategoryInterface[] = [];
 
-  const categories: CategoryInterface[] =
-    (await resCategories.json()) as CategoryInterface[];
-
-  if (!categories || categories.length === 0) {
-    showError(
-      "Không tải được danh mục sản phẩm. Hệ thống đang lỗi mong khách hàng thống cảm"
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/categories`,
+      { cache: "no-store" } // luôn lấy dữ liệu mới
     );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch categories");
+    }
+
+    categories = (await res.json()) as CategoryInterface[];
+  } catch (error) {
+    console.error("Fetch categories failed:", error);
   }
 
   return (
@@ -37,6 +39,4 @@ const Categories = async () => {
       </div>
     </div>
   );
-};
-
-export default Categories;
+}

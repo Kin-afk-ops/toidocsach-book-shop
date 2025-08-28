@@ -1,7 +1,27 @@
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
+import { CategoryInterface } from "@/interface/category.i";
 
-const CategoriesFilter = () => {
+import CategoriesFilterDetail from "./CategoriesFilterDetail";
+
+const CategoriesFilter = async () => {
+  let categories: CategoryInterface[] = [];
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/categories`,
+      { cache: "no-store" } // luôn lấy dữ liệu mới
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch categories");
+    }
+
+    categories = (await res.json()) as CategoryInterface[];
+  } catch (error) {
+    console.error("Fetch categories failed:", error);
+  }
+
   return (
     <aside className="w-[250px] flex-shrink-0">
       <div className="bg-white shadow rounded p-4">
@@ -11,26 +31,12 @@ const CategoriesFilter = () => {
         <div className="mb-4">
           <p className="font-semibold mb-2">Category</p>
           <ul className="space-y-1 pl-3">
-            <li className="group">
-              <button className="cursor-pointer transition duration-100 group-hover:text-[var(--primary)]">
-                Novels
-              </button>
-            </li>
-            <li className="group">
-              <button className="cursor-pointer transition duration-100 group-hover:text-[var(--primary)]">
-                Science
-              </button>
-            </li>
-            <li className="group">
-              <button className="cursor-pointer transition duration-100 group-hover:text-[var(--primary)]">
-                History
-              </button>
-            </li>
+            <CategoriesFilterDetail categories={categories} />
           </ul>
         </div>
 
         {/* Example filter: Price */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <p className="font-semibold mb-2">Price</p>
 
           <ul className="space-y-1 pl-3">
@@ -59,7 +65,7 @@ const CategoriesFilter = () => {
               </Label>
             </li>
           </ul>
-        </div>
+        </div> */}
       </div>
     </aside>
   );

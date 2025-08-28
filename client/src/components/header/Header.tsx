@@ -38,6 +38,7 @@ import { useCartStore } from "@/store/useCartStore";
 import formatSlug from "@/util/formatSlug";
 import { formatPrice } from "@/util/formatPrice ";
 import { CartItemInterface } from "@/interface/cart.i";
+import HeaderSearch from "./HeaderSearch";
 
 const Header = () => {
   const router = useRouter();
@@ -144,18 +145,7 @@ const Header = () => {
             />
           </Link>
 
-          <div className="w-[calc(100%_-_700px)] flex border border-[#ccc] rounded-[10px] items-center">
-            <input
-              placeholder="book"
-              className="h-[40px] w-[85%] outline-0 border-0 pl-4"
-            />
-            <Button
-              variant="default"
-              className="bg-[#e11d48] hover:bg-[#be123c] cursor-pointer w-[15%] "
-            >
-              <Search />
-            </Button>
-          </div>
+          <HeaderSearch />
 
           <div className="flex justify-between w-[340px]">
             {/* <HoverCard openDelay={100} closeDelay={100}>
