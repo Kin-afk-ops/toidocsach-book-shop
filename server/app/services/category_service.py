@@ -1,23 +1,39 @@
 from app.models.category_model import Category
 from app.extensions import db
+from app.services.cloudinary_service import upload_one_image_to_cloudinary
+
+
 
 # CREATE
 def create_category_service(data):
     title = data.get("title")
-    image = data.get("image")
+    file = data.get("file")
 
     if not title:
-        return {"error": "Title is required"}, 400
+        return {"error": "Thiếu title"}, 400
 
-    if Category.query.filter_by(title=title).first():
-        return {"error": "Category already exists"}, 409
+    image_url = None
+    image_public_id = None
 
-    category = Category(title=title, image=image)
-    db.session.add(category)
-    db.session.commit()
+    # Upload file lên Cloudinary (nếu có)
+    if file:
+        result = upload_one_image_to_cloudinary(file)
+        image_url = result.get("image_url")
+        image_public_id = result.get("image_public_id")
 
-    return category.to_dict(), 201
+    category = Category(
+        title=title,
+        image_url=image_url,
+        image_public_id=image_public_id,
+    )
 
+    try:
+        db.session.add(category)
+        db.session.commit()
+        return category.to_dict(), 201
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
 
 # READ ALL
 def get_all_categories_service():

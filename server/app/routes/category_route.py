@@ -12,9 +12,16 @@ category_route = Blueprint("category", __name__, url_prefix="/categories")
 
 @category_route.route("", methods=["POST"])
 def create_category():
-    data = request.get_json()
-    resp, status = create_category_service(data)
-    return jsonify(resp), status
+    # Lấy file (chỉ 1 ảnh)
+    file = request.files.get("file")  # input name="file"
+    data = request.form.to_dict()
+    data["file"] = file
+
+    try:
+        resp, status = create_category_service(data)
+        return jsonify(resp), status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @category_route.route("", methods=["GET"])
