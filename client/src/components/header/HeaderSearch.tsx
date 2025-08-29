@@ -4,21 +4,57 @@ import { History, Search, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Badge } from "../ui/badge";
+import { useHistoryStore } from "@/store/useHistoryStore";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { useRouter } from "next/navigation";
 
 const HeaderSearch = () => {
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState<string>("");
   const [historyMode, setHistoryMode] = useState<boolean>(false);
+  const [suggestList, setSuggestList] = useState<string[]>([]);
+  const [suggestMode, setSuggestMode] = useState<boolean>(false);
 
-  const handleSuggest = (value: string) => {
+  const histories = useHistoryStore((state) => state.history);
+  const addHistory = useHistoryStore((state) => state.addHistory);
+  const clearHistory = useHistoryStore((state) => state.clear);
+
+  const handleSuggest = async (value: string) => {
     if (!value.trim()) return;
-    console.log("suggest:", value);
-    // TODO: gọi API suggest ở đây
+
+    try {
+      const res = await axiosInstance.post(`/suggest`, {
+        search: value,
+        history: histories || [],
+      });
+
+      setSuggestList(res.data);
+      setSuggestMode(true);
+      setHistoryMode(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSearch = (value: string) => {
     if (!value.trim()) return;
-    console.log("search:", value);
-    // TODO: gọi API search hoặc chuyển sang trang /search?keyword=value
+
+    addHistory(value); // lưu vào lịch sử
+    // router.push(`/search?keyword=${encodeURIComponent(value)}`);
+    setSuggestMode(false);
+    setHistoryMode(false);
+
+    router.push("/");
+  };
+
+  const handleFocus = () => {
+    if (searchValue.trim() === "") {
+      if (histories && histories.length > 0) {
+        setHistoryMode(true);
+      }
+    } else if (suggestList.length > 0) {
+      setSuggestMode(true);
+    }
   };
 
   return (
@@ -28,55 +64,108 @@ const HeaderSearch = () => {
         className="h-[40px] w-[85%] outline-0 border-0 pl-4"
         value={searchValue}
         onChange={(e) => {
-          const newValue = e.target.value;
-          setSearchValue(newValue);
-          if (newValue.length > 0) {
-            handleSuggest(newValue); // gọi suggest khi gõ
+          const val = e.target.value;
+          setSearchValue(val);
+          if (val.trim().length > 0) handleSuggest(val);
+          else {
+            setSuggestMode(false);
+            setSuggestList([]);
           }
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSearch(searchValue); // gọi search khi Enter
-          }
+          if (e.key === "Enter") handleSearch(searchValue);
         }}
-        onFocus={() => setHistoryMode(true)}
-        onBlur={() => setHistoryMode(false)}
+        onFocus={handleFocus}
+        onBlur={() => {
+          // blur sẽ xảy ra khi click ra ngoài dropdown
+          setHistoryMode(false);
+          setSuggestMode(false);
+        }}
       />
       <Button
         variant="default"
-        className="bg-[#e11d48] hover:bg-[#be123c] cursor-pointer w-[15%] "
+        className="bg-[#e11d48] hover:bg-[#be123c] cursor-pointer w-[15%]"
+        onClick={() => handleSearch(searchValue)}
       >
         <Search />
       </Button>
 
-      {historyMode && (
-        <div className="absolute bg-white top-[100%] left-0 w-full rounded-[5px] p-4 z-10">
-          <div className="w-full flex justify-between ">
-            <div className="flex">
+      {/* History Dropdown */}
+      {historyMode && histories && histories.length > 0 && (
+        <div
+          className="absolute bg-white top-[100%] left-0 w-full rounded-[5px] p-4 z-10"
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <div className="w-full flex justify-between">
+            <div className="flex items-center">
               <History />
               <p className="font-bold ml-2">Search history</p>
             </div>
-            <div className="text-[var(--text)] hover:text-[var(--primary)] hover:underline transition duration-200 cursor-pointer text-[14px]">
+            <div
+              className="text-[var(--text)] hover:text-[var(--primary)] hover:underline cursor-pointer text-[14px]"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                clearHistory();
+              }} // ngăn onBlur
+            >
               Clear All
             </div>
           </div>
 
-          <div className="mt-2">
-            <Badge
-              variant="secondary"
-              className="flex items-center cursor-pointer "
-            >
-              <span className="text-[14px]"> Secondary </span>
-              <button className="flex outline-0 border-0">
-                <X size={14} />
-              </button>
-            </Badge>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {histories.map((item, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="flex items-center cursor-pointer"
+                onMouseDown={(e) => {
+                  e.preventDefault(); // ngăn blur
+                  handleSearch(item);
+                }}
+              >
+                <span className="text-[14px]">{item}</span>
+                <button
+                  className="flex outline-0 border-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  <X size={14} />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Suggest Dropdown */}
+      {suggestMode && suggestList.length > 0 && (
+        <div className="absolute bg-white top-[100%] left-0 w-full rounded-[5px] p-4 z-10">
+          <div className="w-full flex justify-between">
+            <div className="flex items-center">
+              <History />
+              <p className="font-bold ml-2">Suggest</p>
+            </div>
           </div>
 
-          <div className="w-full flex justify-center">
-            <button className="text-[var(--text)] hover:text-[var(--primary)] hover:underline transition duration-200 cursor-pointer text-[14px]">
-              View All
-            </button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {suggestList.map((suggest, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="flex items-center cursor-pointer"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSearch(suggest);
+                }}
+              >
+                <span className="text-[14px]">{suggest}</span>
+                <button
+                  className="flex outline-0 border-0"
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  <X size={14} />
+                </button>
+              </Badge>
+            ))}
           </div>
         </div>
       )}

@@ -10,8 +10,8 @@ interface ProductPageProps {
 }
 
 const ProductPage = async ({ searchParams }: ProductPageProps) => {
-  const query = searchParams;
-  const bookId = query.q as string;
+  const query = await searchParams;
+  const bookId = (query?.q as string) ?? "";
 
   let bookData: BookInterface | null = null;
 

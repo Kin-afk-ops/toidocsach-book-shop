@@ -2,9 +2,9 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface HistoryState {
-  history: string[] | null;
+  history: string[];
   setHistory: (history: string[]) => void;
-
+  addHistory: (item: string) => void;
   clear: () => void;
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
@@ -12,11 +12,22 @@ interface HistoryState {
 
 export const useHistoryStore = create<HistoryState>()(
   persist(
-    (set) => ({
-      history: null,
+    (set, get) => ({
+      history: [],
       setHistory: (history) => set({ history }),
+      addHistory: (item: string) => {
+        const state = get();
+        let history = state.history ?? [];
 
-      clear: () => set({ history: null }),
+        // Xóa phần tử trùng
+        history = history.filter((h) => h !== item);
+
+        // Thêm item mới lên đầu
+        history = [item, ...history];
+
+        set({ history });
+      },
+      clear: () => set({ history: [] }),
 
       hasHydrated: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
