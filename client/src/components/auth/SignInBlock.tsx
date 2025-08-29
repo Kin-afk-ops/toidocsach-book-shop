@@ -16,13 +16,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PrimaryButton from "../customs/PrimaryButton";
 import Link from "next/link";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { showError, showSuccess } from "@/util/styles/toast-utils";
 import { useAuthStore } from "@/store/useUserStore";
-import LoadingScreen from "../loading/LoadingScreen";
 import { Eye, EyeClosed } from "lucide-react";
 
 interface ChildProps {
@@ -32,8 +31,6 @@ interface ChildProps {
 
 const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
   const router = useRouter();
-
-  const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
   const [hidePassword, setHidePassword] = useState<boolean>(true);
 
@@ -47,6 +44,7 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
       .nonempty({ message: "Mật khẩu không được để trống." })
       .min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự." }),
   });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,26 +56,21 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
-    const loginInfo = values;
     setLoading(true);
     await axiosInstance
-      .post("/auth/login", loginInfo)
-      .then(async (res) => {
-        setLoading(false);
+      .post("/auth/login", values)
+      .then((res) => {
         setUser({
           id: res.data.id,
           email: res.data.email,
         });
 
         showSuccess("Đăng nhập thành công");
-        if (onClose) {
-          onClose();
-        }
+        onClose?.();
       })
       .catch((error) => {
-        setLoading(false);
         console.log(error);
-        showError("Đăng nhập thất bại hãy thử lại");
+        showError("Đăng nhập thất bại, vui lòng thử lại");
       })
       .finally(() => setLoading(false));
   };
@@ -97,12 +90,11 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
                 <FormLabel className="mb-2 text-[lg]">Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter email"
+                    placeholder="Nhập email"
                     {...field}
                     autoComplete="current-email"
                   />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -113,17 +105,16 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
+                <FormLabel className="mb-2 text-[lg]">Mật khẩu</FormLabel>
                 <FormControl>
                   <div className="relative w-full">
                     <Input
-                      placeholder="Enter Password"
+                      placeholder="Nhập mật khẩu"
                       {...field}
                       type={hidePassword ? "password" : "text"}
                       autoComplete="current-password"
                       className="pr-10"
                     />
-
                     <button
                       type="button"
                       onClick={() => setHidePassword(!hidePassword)}
@@ -142,16 +133,17 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
             )}
           />
 
-          <PrimaryButton content="Sign in" type="submit" />
+          <PrimaryButton content="Đăng nhập" type="submit" />
         </form>
       </Form>
+
       <Link
         href="/recoveryPassword"
         className="mt-2"
         onClick={() => onClose?.()}
       >
         <span className="text-[14px] hover:text-[var(--primary)] cursor-pointer">
-          Forgot Your Password?
+          Quên mật khẩu?
         </span>
       </Link>
     </div>

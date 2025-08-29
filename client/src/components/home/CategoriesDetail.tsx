@@ -1,5 +1,7 @@
 import { CategoryInterface } from "@/interface/category.i";
 import Image from "next/image";
+import Link from "next/link";
+import slugify from "slugify";
 
 interface ChildProps {
   categories: CategoryInterface[];
@@ -9,7 +11,10 @@ const CategoriesDetail: React.FC<ChildProps> = ({ categories }) => {
     <div className={`pt-[15px] gap-2 grid grid-cols-${categories?.length}`}>
       {categories.length !== 0 &&
         categories.map((category) => (
-          <div
+          <Link
+            href={`/categories/${slugify(category.title)}.html?q=${
+              category.id
+            }&page=${1}`}
             className=" cursor-pointer group flex justify-center flex-col items-center"
             key={category.id}
           >
@@ -28,7 +33,7 @@ const CategoriesDetail: React.FC<ChildProps> = ({ categories }) => {
             <p className="mt-[15px] text-[16px] group-hover:text-[var(--primary)] transition duration-100 text-center">
               {category.title}
             </p>
-          </div>
+          </Link>
         ))}
     </div>
   );

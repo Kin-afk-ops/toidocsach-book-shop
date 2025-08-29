@@ -53,8 +53,9 @@ def checkout(user_id):
     client_items = data.get("items", [])
     receiver_data = data.get("receiver", {})
     address_data = data.get("address", {})
+    email = data.get("email")
 
-    order, status = checkout_cart(user_id, client_items, receiver_data, address_data)
+    order, status = checkout_cart(user_id, client_items, receiver_data, address_data,email)
     return jsonify(order), status
 
 

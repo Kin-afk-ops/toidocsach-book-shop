@@ -67,12 +67,12 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
   const handleDelete = async (): Promise<void> => {
     if (!bookDelete?.id)
-      return showError("Hệ thống đang lỗi! Xin quý khách hàng thông cảm!");
+      return showError("Hệ thống đang lỗi! Xin quý khách thông cảm!");
     setLoading(true);
     await axiosInstance
       .delete(`/cart/${user?.id}/remove?book_id=${bookDelete?.id}`)
       .then((res) => {
-        const msg = res.data.message || "Item removed successfully!";
+        const msg = res.data.message || "Xóa sản phẩm thành công!";
         showSuccess(msg);
 
         if (cartItems) {
@@ -81,13 +81,12 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
           );
 
           if (updatedItems.length === 0) {
-            clearCart(); // xoá hết thì clear store
+            clearCart();
           } else {
-            setCartItems(updatedItems); // update lại store
+            setCartItems(updatedItems);
           }
         }
 
-        // đồng bộ thêm với state local trong component (nếu có)
         setData((prevData) =>
           prevData.filter((data) => data.book?.id !== bookDelete.id)
         );
@@ -97,7 +96,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
         const errMsg =
           error.response?.data?.error ||
           error.response?.data?.message ||
-          "Xoá sách khỏi giỏ hàng thất bại! Hệ thống đang lỗi sẽ sớm khắc phục. Mong khách hàng thông cảm";
+          "Xóa sách khỏi giỏ hàng thất bại! Hệ thống đang lỗi, mong khách hàng thông cảm.";
 
         showError(errMsg);
       })
@@ -110,21 +109,17 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
     {
       id: "select",
       header: ({ table }) => {
-        {
-          const allChecked = cartItems?.every((item) => item.checked) ?? false;
-          const someChecked =
-            cartItems?.some((item) => item.checked) && !allChecked;
-          return (
-            <Checkbox
-              checked={
-                allChecked ? true : someChecked ? "indeterminate" : false
-              }
-              onCheckedChange={(value) => toggleAllCheck(!!value)}
-              aria-label="Select all"
-              className="cursor-pointer"
-            />
-          );
-        }
+        const allChecked = cartItems?.every((item) => item.checked) ?? false;
+        const someChecked =
+          cartItems?.some((item) => item.checked) && !allChecked;
+        return (
+          <Checkbox
+            checked={allChecked ? true : someChecked ? "indeterminate" : false}
+            onCheckedChange={(value) => toggleAllCheck(!!value)}
+            aria-label="Chọn tất cả"
+            className="cursor-pointer"
+          />
+        );
       },
       cell: ({ row }) => {
         const item = row.original;
@@ -133,7 +128,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
           <Checkbox
             checked={item.checked}
             onCheckedChange={() => toggleItemCheck(item.book?.id || "")}
-            aria-label="Select row"
+            aria-label="Chọn sản phẩm"
             className="cursor-pointer"
           />
         );
@@ -144,14 +139,14 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
     {
       id: "image",
-      header: `Select All (${data.length} items)`,
+      header: `Tất cả (${data.length} sản phẩm)`,
       cell: ({ row }) => {
         const item = row.original;
 
         return (
           <Image
             src={item.book?.images ? item.book.images[0].image_url : ""}
-            alt="image"
+            alt="Hình ảnh sản phẩm"
             width={119}
             height={119}
             className="object-contain w-[119px] h-[119px]"
@@ -195,21 +190,18 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
     },
     {
       accessorKey: "quantity",
-      header: () => <div className="text-center w-full">Quantity</div>,
+      header: () => <div className="text-center w-full">Số lượng</div>,
       cell: ({ row }) => {
         const item = row.original;
         const bookQuantity = item.book?.quantity ? item.book?.quantity : 0;
 
-        // Hàm cập nhật số lượng
         const updateQuantity = async (newQuantity: number) => {
-          // Cập nhật local
           setData((prev) =>
             prev.map((p) =>
               p.id === item.id ? { ...p, quantity: newQuantity } : p
             )
           );
 
-          // Cập nhật store
           setCartItems(
             cartItems.map((p) =>
               p.id === item.id ? { ...p, quantity: newQuantity } : p
@@ -224,7 +216,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
                 quantity: newQuantity,
               });
             } catch (error) {
-              console.error("Update quantity error:", error);
+              console.error("Lỗi cập nhật số lượng:", error);
               showError("Cập nhật số lượng thất bại");
             } finally {
               setLoading(false);
@@ -234,7 +226,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
         return (
           <div className="flex items-center justify-center border border-[#ccc] rounded-[5px]">
-            {/* Giảm */}
             <button
               className="p-1 cursor-pointer"
               onClick={() => {
@@ -246,7 +237,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               <Minus color={`${item.quantity === 1 ? "gray" : "black"}`} />
             </button>
 
-            {/* Input */}
             <input
               className="w-[40px] text-center outline-0"
               type="text"
@@ -262,7 +252,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               }}
             />
 
-            {/* Tăng */}
             <button
               className="p-1 cursor-pointer"
               onClick={() => {
@@ -282,9 +271,9 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
     {
       id: "Subtotal",
-      header: () => <div className="text-center w-full">Subtotal</div>,
+      header: () => <div className="text-center w-full">Tạm tính</div>,
       cell: ({ row }) => {
-        const item = row.original; // lấy object gốc
+        const item = row.original;
         let subtotal;
         if (item.book) {
           subtotal =
@@ -315,13 +304,12 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
                   className="text-[var(--text)] cursor-pointer hover:text-[var(--primary)]"
                   onClick={() => {
                     setBookDelete(book);
-
                     setDeleteMode(true);
                   }}
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Xóa sản phẩm trong giỏ hàng</p>
+                <p>Xóa sản phẩm khỏi giỏ hàng</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -334,7 +322,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
     data: cartItems,
     columns,
     autoResetPageIndex: false,
-
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -384,7 +371,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                😔 Không có sản phẩm nào ở trong giỏ hàng
+                😔 Không có sản phẩm nào trong giỏ hàng
               </TableCell>
             </TableRow>
           )}

@@ -4,12 +4,14 @@ import ListPagination from "@/components/list/ListPagination";
 import LoadingScreen from "@/components/loading/LoadingScreen";
 import { BookItemInterface } from "@/interface/book.i";
 import axiosInstance from "@/lib/api/axiosInstance";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const ListPage = () => {
   const searchParams = useSearchParams();
+
   const currentCateId = searchParams.get("q");
+  const params = useParams<{ slug: string }>();
   const page = (searchParams.get("page") as string) || "1";
   const [bookResult, setBookResult] = useState<{
     books: BookItemInterface[];
@@ -43,15 +45,34 @@ const ListPage = () => {
       }
     };
 
-    fetchBookCategories();
-  }, [currentCateId, page]);
+    const fetchSearchBook = async (): Promise<void> => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.post(`/search`, {
+          keyword: currentCateId,
+          page: page,
+        });
+        setBookResult(res?.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params?.slug === "search") {
+      fetchSearchBook();
+    } else {
+      fetchBookCategories();
+    }
+  }, [currentCateId, page, params]);
 
   return (
     <>
       {loading && <LoadingScreen />}
       <div className="list-container">
         {/* Nếu không có sách */}
-        {bookResult.books.length === 0 ? (
+        {bookResult?.books?.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
             Không có sản phẩm nào để hiển thị
           </div>

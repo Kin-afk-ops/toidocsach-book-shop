@@ -40,10 +40,12 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
                   />
                 </div>
               </CardHeader>
+
               <CardContent className="p-2">
                 <CardTitle className="text-[14px] font-medium line-clamp-2 h-[40px]">
                   {product.title}
                 </CardTitle>
+
                 <div className="mt-2">
                   <span className="font-bold font-semibold text-[var(--primary)] text-xl">
                     {product.price && product.discount
@@ -53,20 +55,23 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
                         )
                       : "0"}
                   </span>
-                  <Badge
-                    variant="destructive"
-                    className="px-[4px] py-[3px] ml-2"
-                  >
-                    -{product.discount}%
-                  </Badge>
+                  {product.discount ? (
+                    <Badge
+                      variant="destructive"
+                      className="px-[4px] py-[3px] ml-2"
+                    >
+                      -{product.discount}%
+                    </Badge>
+                  ) : null}
                 </div>
 
                 <div className="mt-2">
-                  <span className=" font-semibold text-[var(--text)] text-sm  line-through">
+                  <span className="font-semibold text-[var(--text)] text-sm line-through">
                     {formatPrice(product.price)}
                   </span>
                 </div>
               </CardContent>
+
               <CardFooter className="p-2">
                 <div className="w-full bg-gray-200 rounded-full h-4 relative">
                   <div
@@ -80,7 +85,7 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
                   ></div>
 
                   <div className="absolute top-0 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white">
-                    Sold {product.sold_count}
+                    Đã bán {product.sold_count}
                   </div>
                 </div>
               </CardFooter>

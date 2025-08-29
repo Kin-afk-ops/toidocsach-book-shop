@@ -147,7 +147,7 @@ const Header = () => {
 
           <HeaderSearch />
 
-          <div className="flex justify-between w-[340px]">
+          <div className="flex justify-end gap-12 w-[340px]">
             {/* <HoverCard openDelay={100} closeDelay={100}>
               <HoverCardTrigger>
                 <div className="text-[12px]  cursor-pointer leading-relaxed text-[var(--text)] relative">
@@ -480,7 +480,7 @@ const Header = () => {
                   >
                     <div className="flex flex-col  items-center">
                       <ShoppingCart color="#646464" className="mb-1 " />
-                      My Cart
+                      Giỏ hàng
                     </div>
                     {cartItems.length > 0 && (
                       <Badge
@@ -549,7 +549,7 @@ const Header = () => {
                       ))
                     ) : (
                       <div className="w-full flex justify-center text-[var(--text)] pb-6">
-                        No Propducts
+                        Không có sản phẩm
                       </div>
                     )}
                   </div>
@@ -582,7 +582,7 @@ const Header = () => {
                 >
                   <div className="flex flex-col  items-center">
                     <BookA color="#646464" className="mb-1 " />
-                    My Order
+                    Đơn hàng
                   </div>
                 </button>
               </div>
@@ -596,7 +596,7 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <div className="text-[12px] flex flex-col cursor-pointer items-center leading-relaxed text-[var(--text)]">
                   <User color="#646464" className="mb-1 " />
-                  My Account
+                  Tài khoản
                 </div>
               </DropdownMenuTrigger>
 
@@ -608,7 +608,7 @@ const Header = () => {
                       className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[var(--text)] rounded-lg bg-white text-[var(--text)]
              hover:scale-105 hover:bg-white transition-transform duration-300 ease-in-out cursor-pointer"
                     >
-                      <span>Sign out</span>
+                      <span>Đăng xuất</span>
                     </Button>
                   </div>
                 </DropdownMenuContent>
@@ -619,21 +619,21 @@ const Header = () => {
                       className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] rounded-lg text-white transition-colors cursor-pointer"
                       onClick={() => setModal("signin")}
                     >
-                      <span>Sign In</span>
+                      <span>Đăng nhập</span>
                     </Button>
                     <Button
                       onClick={() => setModal("signup")}
                       className="flex items-center justify-center w-full gap-2 px-4 py-2 border border-[#e11d48] rounded-lg bg-white text-[#e11d48]
              hover:scale-105 hover:bg-white transition-transform duration-300 ease-in-out cursor-pointer"
                     >
-                      <span>Sign up</span>
+                      <span>Đăng ký</span>
                     </Button>
                   </div>
                 </DropdownMenuContent>
               )}
             </DropdownMenu>
 
-            <div className="text-[var(--text)] text-[14px] w-[100px] flex justify-center items-center">
+            {/* <div className="text-[var(--text)] text-[14px] w-[100px] flex justify-center items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -673,7 +673,7 @@ const Header = () => {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            </div> */}
           </div>
         </div>
       </header>

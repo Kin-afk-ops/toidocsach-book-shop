@@ -18,7 +18,6 @@ import { useEffect, useState } from "react";
 
 const CartPage = () => {
   const params = useParams<{ id: string }>();
-
   const router = useRouter();
   const userId = params.id;
   const cartItems = useCartStore((state) => state.cartItems);
@@ -64,7 +63,7 @@ const CartPage = () => {
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       return showWarning(
-        "Your cart is empty. Please add some books before proceeding to checkout."
+        "Giỏ hàng của bạn đang trống. Vui lòng thêm sách trước khi tiến hành thanh toán."
       );
     }
 
@@ -72,7 +71,7 @@ const CartPage = () => {
 
     if (checkedItems.length === 0) {
       return showWarning(
-        "Please select at least one product to proceed to checkout."
+        "Vui lòng chọn ít nhất một sản phẩm để tiến hành thanh toán."
       );
     }
 
@@ -95,13 +94,13 @@ const CartPage = () => {
             <div className="list-container flex flex-col items-center justify-center w-full py-6">
               <Image
                 src="/no_product_image.png"
-                alt="no product image"
+                alt="không có sản phẩm"
                 width={200}
                 height={200}
                 className="object-contain"
               />
               <span className="text-[var(--text)] text-[18px]">
-                No Products
+                Không có sản phẩm nào
               </span>
             </div>
           )}
@@ -111,14 +110,14 @@ const CartPage = () => {
           <div className="sticky top-6">
             <div className="list-container p-4">
               <div className="flex justify-between items-center pb-6">
-                <p className="text-[16px] font-bold">Grand Total</p>
+                <p className="text-[16px] font-bold">Tổng cộng</p>
                 <p className="text-2xl text-[var(--primary)] font-bold">
                   {formatPrice(handleGrandTotal())}
                 </p>
               </div>
 
               <PrimaryButton
-                content="Proceed to Checkout"
+                content="Tiến hành thanh toán"
                 handleTodo={() => {
                   handleCheckout();
                 }}

@@ -42,19 +42,20 @@ const ProductInfo: React.FC<ChildProps> = ({
       <div className="grid grid-cols-2 mt-4 text-[var(--text) text-sm">
         <div>
           <div>
-            Supplier: <span className="font-bold">{supplier && supplier}</span>
+            Nhà cung cấp:{" "}
+            <span className="font-bold">{supplier && supplier}</span>
           </div>
           <div>
-            Publisher:{" "}
+            Nhà xuất bản:{" "}
             <span className="font-bold">{publisher && publisher}</span>
           </div>
         </div>
         <div>
           <div>
-            Author: <span className="font-bold">{author && author}</span>
+            Tác giả: <span className="font-bold">{author && author}</span>
           </div>
           <div>
-            Book layout: <span className="font-bold">{layout && layout}</span>
+            Hình thức bìa: <span className="font-bold">{layout && layout}</span>
           </div>
         </div>
       </div>
@@ -93,7 +94,7 @@ const ProductInfo: React.FC<ChildProps> = ({
       </div>
 
       <div className="text-[18px] font-bold mt-6 flex items-center">
-        Quantity:
+        Số lượng:
         <div className="flex items-center ml-4 border border-[#ccc] rounded-[5px]">
           <button
             className="p-2 cursor-pointer"

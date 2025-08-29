@@ -25,11 +25,11 @@ const CategoriesFilter = async () => {
   return (
     <aside className="w-[250px] flex-shrink-0">
       <div className="bg-white shadow rounded p-4">
-        <h2 className="text-lg font-bold mb-4">Filters</h2>
+        <h2 className="text-lg font-bold mb-4">Lọc sản phẩm</h2>
 
         {/* Example filter: Categories */}
         <div className="mb-4">
-          <p className="font-semibold mb-2">Category</p>
+          <p className="font-semibold mb-2">Danh mục</p>
           <ul className="space-y-1 pl-3">
             <CategoriesFilterDetail categories={categories} />
           </ul>

@@ -68,7 +68,7 @@ const MyOrderPage = () => {
     await axiosInstance
       .put(`/order/${cancelOrder?.id}/${userId}/cancelled`)
       .then(() => {
-        showSuccess("Đã hủy đơn hàng thành công!");
+        showSuccess("Hủy đơn hàng thành công!");
         setOrders((prev) =>
           prev
             ? prev.map((order) =>
@@ -83,7 +83,7 @@ const MyOrderPage = () => {
         const errMsg =
           error.response?.data?.error ||
           error.response?.data?.message ||
-          "Hệ thống đang bị lỗi, sẽ sớm khắc phục. Mong quý khách hàng thông cảm";
+          "Hệ thống đang gặp lỗi. Mong quý khách thông cảm.";
 
         showError(errMsg);
       })
@@ -103,24 +103,24 @@ const MyOrderPage = () => {
             <TableRow>
               <TableHead></TableHead>
               <TableHead></TableHead>
-              <TableHead className="text-center">Price</TableHead>
-              <TableHead className="text-center">Quantity</TableHead>
-              <TableHead className="text-center">Amount</TableHead>
-              <TableHead className="text-center">Address</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-center">Action</TableHead>
+              <TableHead className="text-center">Giá</TableHead>
+              <TableHead className="text-center">Số lượng</TableHead>
+              <TableHead className="text-center">Thành tiền</TableHead>
+              <TableHead className="text-center">Địa chỉ</TableHead>
+              <TableHead className="text-center">Trạng thái</TableHead>
+              <TableHead className="text-center">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders &&
-              orders?.map(
+              orders.map(
                 (order) =>
                   order.items &&
-                  order?.items?.map((item, index) => (
+                  order.items.map((item, index) => (
                     <TableRow
                       key={item.id}
                       className={`${
-                        index === (order?.items?.length ?? 0) - 1
+                        index === (order.items?.length ?? 0) - 1
                           ? "border-b border-[#ccc]"
                           : "border-0"
                       }`}
@@ -146,8 +146,8 @@ const MyOrderPage = () => {
                       <TableCell className="w-[340px] h-[100px] flex flex-col justify-between text-[14px] text-[var(--text)]">
                         <Link
                           href={`/product/${formatSlug(
-                            item.book ? item.book?.title : ""
-                          )}.html?q=${item.book ? item.book?.id : ""}`}
+                            item.book ? item.book.title : ""
+                          )}.html?q=${item.book ? item.book.id : ""}`}
                           className="text-base-normal break-words line-clamLink-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
                         >
                           {item.book?.title}
@@ -171,7 +171,7 @@ const MyOrderPage = () => {
                       </TableCell>
 
                       <TableCell className="text-center align-top">
-                        {item && item.quantity}
+                        {item.quantity}
                       </TableCell>
 
                       {index === 0 && (
@@ -179,22 +179,21 @@ const MyOrderPage = () => {
                           className="text-center align-top font-bold text-[var(--primary)]"
                           rowSpan={order.items ? order.items.length : 0}
                         >
-                          {formatPrice(order?.amount)}
+                          {formatPrice(order.amount)}
                         </TableCell>
                       )}
 
                       {index === 0 && (
                         <TableCell
                           className="flex flex-col justify-between text-[14px] text-[var(--text)]"
-                          rowSpan={order?.items && order?.items.length}
+                          rowSpan={order.items?.length}
                         >
-                          <span className="text-base-normal whitespace-normal  break-words text-justify">
+                          <span className="text-base-normal whitespace-normal break-words text-justify">
                             {formatAddress(order)}
                           </span>
-
-                          {order.note !== "" && (
-                            <div className="text-base-normal whitespace-normal  break-words text-justify mt-2">
-                              <span className="font-bold">Note:</span>{" "}
+                          {order.note && (
+                            <div className="text-base-normal whitespace-normal break-words text-justify mt-2">
+                              <span className="font-bold">Ghi chú:</span>{" "}
                               {order.note}
                             </div>
                           )}
@@ -203,33 +202,39 @@ const MyOrderPage = () => {
 
                       {index === 0 && (
                         <TableCell
-                          className="text-center align-top font-bold "
-                          rowSpan={order.items ? order.items.length : 0}
+                          className="text-center align-top font-bold"
+                          rowSpan={order.items?.length}
                         >
                           <Badge
                             className={`flex items-center justify-center w-full gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors bg-transparent ${
-                              order?.status === "pending"
+                              order.status === "pending"
                                 ? "text-yellow-500"
-                                : order?.status === "delivering"
+                                : order.status === "delivering"
                                 ? "text-blue-500"
-                                : order?.status === "completed"
+                                : order.status === "completed"
                                 ? "text-green-500"
                                 : "text-red-500"
                             }`}
                           >
-                            {order?.status}
+                            {order.status === "pending"
+                              ? "Đang chờ xử lý"
+                              : order.status === "delivering"
+                              ? "Đang giao hàng"
+                              : order.status === "completed"
+                              ? "Hoàn thành"
+                              : "Đã hủy"}
                           </Badge>
                         </TableCell>
                       )}
 
                       {index === 0 && (
                         <TableCell
-                          className="text-center align-top font-bold "
-                          rowSpan={order?.items && order?.items.length}
+                          className="text-center align-top font-bold"
+                          rowSpan={order.items?.length}
                         >
-                          {order?.status === "pending" && (
+                          {order.status === "pending" && (
                             <PrimaryButton
-                              content="Cancel"
+                              content="Hủy đơn"
                               handleTodo={() => {
                                 setCancelMode(true);
                                 setCancelOrder(order);
@@ -264,7 +269,7 @@ const MyOrderPage = () => {
               className="rounded-md bg-red-500 text-white hover:bg-red-600 cursor-pointer"
               onClick={() => cancelOrder?.id && handleCancelOrder()}
             >
-              Hủy đơn hàng
+              Xác nhận hủy
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

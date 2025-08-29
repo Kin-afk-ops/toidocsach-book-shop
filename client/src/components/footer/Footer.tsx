@@ -10,7 +10,7 @@ const Footer = () => {
     <footer className="bg-white py-12 px-5">
       <div className="max-w-[1230px] mx-auto">
         <div className="grid grid-cols-12 gap-6">
-          {/* Left */}
+          {/* Bên trái */}
           <div className="col-span-12 lg:col-span-3 relative pr-6 border-r border-gray-300">
             <Link href="/">
               <Image
@@ -22,79 +22,79 @@ const Footer = () => {
               />
             </Link>
             <p className="text-sm mb-2">
-              3rd Floor, 4/9A Mau Than Street, Xuan Khanh Ward, Ninh Kieu
-              District, Can Tho City
+              Tầng 3, số 4/9A Đường Mậu Thân, Phường Xuân Khánh, Quận Ninh Kiều,
+              Thành phố Cần Thơ
             </p>
             <p className="text-sm mb-4">
-              <span className="font-bold">Toidocsach</span> accepts online
-              orders and delivers to your door.
+              <span className="font-bold">Toidocsach</span> nhận đơn hàng trực
+              tuyến và giao tận nơi.
             </p>
           </div>
 
-          {/* Right */}
+          {/* Bên phải */}
           <div className="col-span-12 lg:col-span-9 lg:pl-12">
             <div className="grid grid-cols-12 gap-6 mb-6">
-              {/* Services */}
+              {/* Dịch vụ */}
               <div className="col-span-12 md:col-span-4">
-                <p className="text-xl font-bold mb-4">SERVICES</p>
+                <p className="text-xl font-bold mb-4">DỊCH VỤ</p>
                 <ul className="space-y-2">
                   <li>
                     <Link
                       href="/about-toidocsach"
                       className="hover:text-primary transition-colors"
                     >
-                      About <b>Toidocsach</b>
+                      Giới thiệu về <b>Toidocsach</b>
                     </Link>
                   </li>
                 </ul>
               </div>
 
-              {/* Support */}
+              {/* Hỗ trợ */}
               <div className="col-span-12 md:col-span-4">
-                <p className="text-xl font-bold mb-4">SUPPORT</p>
+                <p className="text-xl font-bold mb-4">CHÍNH SÁCH</p>
                 <ul className="space-y-2">
                   <li>
-                    <Link
-                      href="/nationwide-shipping"
+                    <div
+                      // href="/nationwide-shipping"
                       className="hover:text-primary transition-colors"
                     >
-                      Nationwide Shipping
-                    </Link>
+                      Giao hàng toàn quốc
+                    </div>
                   </li>
                   <li>
-                    <Link
-                      href="/7-day-return"
+                    <div
+                      // href="/7-day-return"
                       className="hover:text-primary transition-colors"
                     >
-                      7-Day Returns
-                    </Link>
+                      Đổi trả trong 7 ngày
+                    </div>
                   </li>
                   <li>
-                    <Link
-                      href="/100-percent-refund"
+                    <div
+                      // href="/100-percent-refund"
                       className="hover:text-primary transition-colors"
                     >
-                      100% Refund
-                    </Link>
+                      Hoàn tiền 100%
+                    </div>
                   </li>
                   {/* <li>
                     <Link
                       href="/payment-methods"
                       className="hover:text-primary transition-colors"
                     >
-                      Cash, VNPAY & MOMO
+                      Thanh toán: Tiền mặt, VNPAY & MOMO
                     </Link>
                   </li> */}
                 </ul>
               </div>
 
-              {/* Account */}
+              {/* Tài khoản */}
               {/* <FooterAccount /> */}
             </div>
 
-            {/* Contact */}
+            {/* Liên hệ */}
             <div>
-              <p className="text-xl font-bold mb-4">CONTACT</p>
+              <p className="text-xl font-bold mb-4">LIÊN HỆ</p>
               <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <li className="flex items-center space-x-2">
                   <MapPin />
@@ -106,7 +106,7 @@ const Footer = () => {
                     rel="noopener noreferrer"
                     className="hover:underline hover:text-[var(--primary)] transition-colors"
                   >
-                    4/9A, Mau Than, Ninh Kieu, Can Tho
+                    4/9A, Mậu Thân, Ninh Kiều, Cần Thơ
                   </a>
                 </li>
                 <li className="flex items-center space-x-2">
@@ -137,7 +137,7 @@ const Footer = () => {
         <hr className="my-6 border-gray-300" />
 
         <div className="text-center text-sm">
-          <span>© All rights reserved by </span>
+          <span>© Bản quyền thuộc về </span>
           <span className="font-bold cursor-pointer hover:text-primary">
             Toidocsach
           </span>

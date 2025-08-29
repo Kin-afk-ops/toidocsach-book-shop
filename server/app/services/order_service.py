@@ -2,6 +2,7 @@ from app.extensions import db
 from app.models.cart_model import Cart, CartItem
 from app.models.order_model import Order, OrderItem
 from app.models.book_item_model import BookItem
+from app.utils.send_email import send_email
 
 
 def get_orders_by_user(user_id):
@@ -16,7 +17,44 @@ def get_order_by_id(order_id):
     return order.to_dict(include_items=True)
 
 
-def checkout_cart(user_id, client_items, receiver_data, address_data):
+
+
+def send_order_confirmation_email(order,email):
+    """
+    Gửi email xác nhận đơn hàng
+    """
+    subject = f"Xác nhận đơn hàng #{order.id} - Toidocsach Shop"
+
+    # Build HTML body
+    items_html = ""
+    for item in order.items:
+        discount = getattr(item, "discount", 0)  # nếu item không có discount thì = 0
+        final_price = item.price - (item.price * discount) / 100
+        items_html += f"<li>{item.book_item.title} x {item.quantity} - {final_price}₫</li>"
+
+    body_html = f"""    
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2 style="color: #2c3e50;">Xác nhận đơn hàng</h2>
+        <p>Xin chào <strong>{order.fullname}</strong>,</p>
+        <p>Cảm ơn bạn đã đặt hàng tại <strong>Book Shop</strong>. Chi tiết đơn hàng của bạn như sau:</p>
+        <ul>
+          {items_html}
+        </ul>
+        <p><strong>Tổng tiền: {order.amount}₫</strong></p>
+        <p>Địa chỉ giao hàng:</p>
+        <p>{order.address}, {order.ward}, {order.province}, {order.country}</p>
+        <p>Ghi chú: {order.note or "Không có"}</p>
+        <p>Trạng thái đơn hàng: Đang xử lý</p>
+        <hr style="margin:20px 0;">
+        <p>Trân trọng,<br><strong>Book Shop Team</strong></p>
+      </body>
+    </html>
+    """
+
+    send_email(email, subject, body_html)
+
+def checkout_cart(user_id, client_items, receiver_data, address_data,email):
     if not client_items:
         return {"error": "No items to checkout"}, 400
 
@@ -52,21 +90,30 @@ def checkout_cart(user_id, client_items, receiver_data, address_data):
         if not book:
             continue
 
+        # Chỉ lấy số lượng còn lại trong giỏ nếu client gửi nhiều hơn
         quantity = min(quantity, cart_item.quantity)
 
+        # Tính giá sau discount
+        final_price = book.price - (book.price * book.discount / 100) if book.discount else book.price
+
+        # Tạo order item với giá đã tính
         order_item = OrderItem(
             book_id=book.id,
             quantity=quantity,
-            price=book.price
+            price=final_price
         )
         order.items.append(order_item)
-        total_amount += float(book.price) * quantity
 
+        # Cộng tổng amount
+        total_amount += final_price * quantity
+
+        # Trừ số lượng trong giỏ và xóa nếu hết
         cart_item.quantity -= quantity
         if cart_item.quantity <= 0:
             db.session.delete(cart_item)
 
     order.amount = total_amount
+
     db.session.add(order)
     db.session.commit()
 
@@ -77,6 +124,11 @@ def checkout_cart(user_id, client_items, receiver_data, address_data):
     else:
         current_cart = cart.to_dict(include_items=True)
 
+   # Gửi email xác nhận đơn hàng
+    try:
+        send_order_confirmation_email(order,email)
+    except Exception as e:
+        print("Gửi email xác nhận đơn hàng thất bại:", e)
 
     return {
         "message": "Đã tạo đơn hàng thành công",

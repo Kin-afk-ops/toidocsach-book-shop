@@ -41,3 +41,23 @@ def search_books(keyword: str):
     )
 
     return [book.to_dict(include_detail=True, include_category=True) for book in query]
+
+
+
+
+def search_books_with_pagination(keyword: str, page: int = 1, limit: int = 10):
+    """
+    Search có phân trang
+    """
+    all_results = search_books(keyword)
+    total = len(all_results)
+    total_pages = (total + limit - 1) // limit
+    start = (page - 1) * limit
+    end = start + limit
+    paginated_results = all_results[start:end]
+
+    return {
+        "books": paginated_results,
+        "total_pages": total_pages,
+        "current_page": page
+    }

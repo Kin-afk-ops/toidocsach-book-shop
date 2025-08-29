@@ -12,28 +12,27 @@ export default async function Categories() {
     );
 
     if (!res.ok) {
-      throw new Error("Failed to fetch categories");
+      throw new Error("Không thể lấy danh mục sản phẩm");
     }
 
     categories = (await res.json()) as CategoryInterface[];
   } catch (error) {
-    console.error("Fetch categories failed:", error);
+    console.error("Lấy danh mục thất bại:", error);
   }
 
   return (
     <div className="main-container">
       <div className="p-[15px]">
         <div className="flex text-[var(--text)] font-bold text-[20px] items-center pb-[15px] border-b border-[#ddd]">
-          <ChartBarBig className="mr-2 " size={30} color="#e11d48" />
-          <p>Product Category</p>
+          <ChartBarBig className="mr-2" size={30} color="#e11d48" />
+          <p>Danh mục sản phẩm</p>
         </div>
 
         {categories.length > 0 ? (
           <CategoriesDetail categories={categories} />
         ) : (
           <div className="text-center text-red-500 font-medium py-4">
-            The system is experiencing an error. Sometimes errors may occur,
-            please kindly understand.
+            Hệ thống đang gặp sự cố. Đôi khi xảy ra lỗi, mong bạn thông cảm.
           </div>
         )}
       </div>

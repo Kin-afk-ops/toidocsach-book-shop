@@ -25,6 +25,7 @@ import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
 import { getProvinces, getWards } from "@/lib/api/addressApi";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { useCartStore } from "@/store/useCartStore";
+import { useAuthStore } from "@/store/useUserStore";
 import { formatPrice } from "@/util/formatPrice ";
 import { showError, showSuccess } from "@/util/styles/toast-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +44,7 @@ const OrderPage = () => {
   const setCartItems = useCartStore((state) => state.setCartItems);
   const setCart = useCartStore((state) => state.setCart);
   const clear = useCartStore((state) => state.clear);
+  const user = useAuthStore((state) => state.user);
 
   const formSchema = z.object({
     fullname: z.string().nonempty({ message: "Họ tên không được để trống." }),
@@ -52,12 +54,11 @@ const OrderPage = () => {
       .regex(/^[0-9]{10,11}$/, { message: "Số điện thoại không hợp lệ." }),
     country: z.string().nonempty({ message: "Vui lòng chọn quốc gia." }),
     province: z.string(),
-
     ward: z.string(),
     address: z.string().nonempty({ message: "Địa chỉ không được để trống." }),
     paymentMethod: z
       .string()
-      .nonempty({ message: "payment không được để trống." }),
+      .nonempty({ message: "Vui lòng chọn phương thức thanh toán." }),
     note: z.string(),
   });
 
@@ -79,6 +80,7 @@ const OrderPage = () => {
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
     const formInfo = values;
+    const amount = handleGrandTotal();
     const checkedItems = cartItems
       .filter((item) => item.checked)
       .map(({ book_id, quantity }) => ({
@@ -94,7 +96,6 @@ const OrderPage = () => {
           fullname: formInfo.fullname,
           phone: formInfo.phone,
           payment_method: formInfo.paymentMethod,
-          amount: handleGrandTotal(),
           note: formInfo.note,
         },
         address: {
@@ -103,10 +104,12 @@ const OrderPage = () => {
           ward: formInfo.ward,
           address: formInfo.address,
         },
+        email: user?.email,
       })
       .then((res) => {
         showSuccess(res?.data.message);
         const cart = res?.data.cart;
+        console.log(res.data);
 
         if (cart) {
           setCart(cart);
@@ -126,7 +129,7 @@ const OrderPage = () => {
         const errMsg =
           error.response?.data?.error ||
           error.response?.data?.message ||
-          "Đã có lỗi từ hệ thống. Mong quý khách hàng thông cảm!";
+          "Đã có lỗi từ hệ thống. Mong quý khách thông cảm!";
 
         showError(errMsg);
       })
@@ -161,7 +164,7 @@ const OrderPage = () => {
     return cartChecks.reduce((total, item) => {
       if (!item.book) return total;
 
-      const { price, discount } = item.book;
+      const { price, discount } = item?.book;
       const finalPrice =
         price && discount ? price - (price * discount) / 100 : price ?? 0;
 
@@ -178,10 +181,11 @@ const OrderPage = () => {
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <div>
+            {/* Thông tin giao hàng */}
             <div className="flex w-full justify-center my-4">
               <div className="w-full bg-white p-4">
                 <div className="py-4 text-[16px] font-bold uppercase w-full border-b border-[#ccc]">
-                  Shipping Address
+                  Thông tin giao hàng
                 </div>
 
                 <div className="space-y-8 w-full min-w-[300px] mt-4">
@@ -192,11 +196,11 @@ const OrderPage = () => {
                       <FormItem className="w-full">
                         <div className="flex items-center">
                           <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                            Full name of recipient
+                            Họ tên người nhận
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Press full name of recipient"
+                              placeholder="Nhập họ tên người nhận"
                               {...field}
                               autoComplete="current-fullname"
                             />
@@ -215,11 +219,11 @@ const OrderPage = () => {
                       <FormItem className="w-full">
                         <div className="flex items-center">
                           <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                            Phone number
+                            Số điện thoại
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Ex: 0979123xxx (10 digit)"
+                              placeholder="Ví dụ: 0979123xxx (10 số)"
                               {...field}
                               autoComplete="current-phone"
                             />
@@ -237,7 +241,7 @@ const OrderPage = () => {
                       <FormItem className="w-full">
                         <div className="flex items-center">
                           <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                            Country
+                            Quốc gia
                           </FormLabel>
                           <FormControl>
                             <Select
@@ -261,15 +265,13 @@ const OrderPage = () => {
                               defaultValue={field.value || "Việt Nam"}
                             >
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select a country" />
+                                <SelectValue placeholder="Chọn quốc gia" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="Việt Nam">
                                   Việt Nam
                                 </SelectItem>
-                                <SelectItem value="other">
-                                  Khác / Other
-                                </SelectItem>
+                                <SelectItem value="other">Khác</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -289,15 +291,14 @@ const OrderPage = () => {
                             <FormItem className="w-full">
                               <div className="flex items-center">
                                 <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                                  Province/City
+                                  Tỉnh/Thành phố
                                 </FormLabel>
                                 <FormControl>
                                   <Select
                                     onValueChange={async (value) => {
-                                      field.onChange(value); // update react-hook-form
-                                      form.setValue("ward", ""); // reset ward khi đổi tỉnh
+                                      field.onChange(value);
+                                      form.setValue("ward", "");
 
-                                      // tìm province theo tên
                                       const selectedProvince = provinces.find(
                                         (p) => p.name === value
                                       );
@@ -313,7 +314,7 @@ const OrderPage = () => {
                                     defaultValue={field.value}
                                   >
                                     <SelectTrigger className="w-full">
-                                      <SelectValue placeholder="Select a province" />
+                                      <SelectValue placeholder="Chọn tỉnh/thành" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {provinces.map((province) => (
@@ -346,7 +347,7 @@ const OrderPage = () => {
                             <FormItem className="w-full">
                               <div className="flex items-center">
                                 <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                                  Wards
+                                  Phường/Xã
                                 </FormLabel>
                                 <FormControl>
                                   <Select
@@ -354,7 +355,7 @@ const OrderPage = () => {
                                     defaultValue={field.value}
                                   >
                                     <SelectTrigger className="w-full">
-                                      <SelectValue placeholder="Select a ward" />
+                                      <SelectValue placeholder="Chọn phường/xã" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {wards.map((ward) => (
@@ -384,11 +385,11 @@ const OrderPage = () => {
                       <FormItem className="w-full">
                         <div className="flex items-center">
                           <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                            Shipping address
+                            Địa chỉ cụ thể
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Press shipping address"
+                              placeholder="Nhập địa chỉ cụ thể"
                               {...field}
                               autoComplete="current-address"
                             />
@@ -402,10 +403,11 @@ const OrderPage = () => {
               </div>
             </div>
 
+            {/* Phương thức thanh toán */}
             <div className="flex w-full justify-center my-4">
               <div className="w-full bg-white p-4">
                 <div className="py-4 text-[16px] font-bold uppercase w-full border-b border-[#ccc]">
-                  Payment Method
+                  Phương thức thanh toán
                 </div>
 
                 <div className="space-y-8 w-full min-w-[300px] mt-4">
@@ -421,42 +423,6 @@ const OrderPage = () => {
                             className="flex flex-col space-y-2 "
                             defaultValue="cod"
                           >
-                            {/* <FormItem className="flex items-center space-x-2">
-                          <FormControl>
-                            <RadioGroupItem
-                              value="VN PAY"
-                              className="cursor-pointer"
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <Image
-                              src="https://cdn1.fahasa.com/skin/frontend/base/default/images/payment_icon/ico_vnpay.svg?q=11294"
-                              width={40}
-                              height={24}
-                              alt="vn pay"
-                            />
-                            VN PAY
-                          </FormLabel>
-                        </FormItem>
-  
-                        <FormItem className="flex items-center space-x-2">
-                          <FormControl>
-                            <RadioGroupItem
-                              value="paypal"
-                              className="cursor-pointer"
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <Image
-                              src="https://cdn1.fahasa.com/skin/frontend/base/default/images/payment_icon/ico_vnpay.svg?q=11294"
-                              width={40}
-                              height={24}
-                              alt="vn pay"
-                            />
-                            PayPal
-                          </FormLabel>
-                        </FormItem> */}
-
                             <FormItem className="flex items-center space-x-2">
                               <FormControl>
                                 <RadioGroupItem
@@ -469,9 +435,9 @@ const OrderPage = () => {
                                   src="https://cdn1.fahasa.com/skin/frontend/base/default/images/payment_icon/ico_cashondelivery.svg?q=11294"
                                   width={40}
                                   height={24}
-                                  alt="vn pay"
+                                  alt="cod"
                                 />
-                                Cash on Delivery
+                                Thanh toán khi nhận hàng
                               </FormLabel>
                             </FormItem>
                           </RadioGroup>
@@ -485,10 +451,11 @@ const OrderPage = () => {
               </div>
             </div>
 
+            {/* Ghi chú */}
             <div className="flex w-full justify-center my-4">
               <div className="w-full bg-white p-4">
                 <div className="py-4 text-[16px] font-bold uppercase w-full border-b border-[#ccc]">
-                  Note
+                  Ghi chú
                 </div>
 
                 <div className="space-y-8 w-full min-w-[300px] mt-4">
@@ -498,11 +465,11 @@ const OrderPage = () => {
                     render={({ field }) => (
                       <FormItem className="flex items-center">
                         <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
-                          Note
+                          Ghi chú
                         </FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Press note"
+                            placeholder="Nhập ghi chú"
                             {...field}
                             autoComplete="current-note"
                           />
@@ -516,12 +483,14 @@ const OrderPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Xác nhận đơn hàng */}
           <div className="relative">
             <div className="sticky top-6">
               <div className="flex w-full justify-center my-4">
                 <div className="w-full bg-white p-4">
                   <div className="py-4 text-[16px] font-bold uppercase w-full border-b border-[#ccc]">
-                    Check order again
+                    Kiểm tra đơn hàng
                   </div>
 
                   <div>
@@ -556,7 +525,7 @@ const OrderPage = () => {
                                 </div>
                               </TableCell>
                               <TableCell className="flex items-center flex-col">
-                                <p className="text-[16px] line-[16px">
+                                <p className="text-[16px] line-[16px]">
                                   {cartCheck.book
                                     ? formatPrice(
                                         cartCheck.book.price -
@@ -596,14 +565,14 @@ const OrderPage = () => {
 
                     <div className="flex justify-between mt-4">
                       <div className="flex items-center">
-                        <span className="text-[18px] ">Order Total: </span>
+                        <span className="text-[18px] ">Tổng đơn hàng: </span>
                         <span className="ml-2 text-[20px] font-bold text-[var(--primary)]">
                           {formatPrice(handleGrandTotal())}
                         </span>
                       </div>
                       <div className="w-[50%]">
                         <PrimaryButton
-                          content="Order Confirmation"
+                          content="Xác nhận đơn hàng"
                           type="submit"
                         />
                       </div>

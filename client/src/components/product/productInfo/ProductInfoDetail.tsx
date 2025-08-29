@@ -17,67 +17,67 @@ interface ChildProps {
 const ProductInfoDetail: React.FC<ChildProps> = ({ bookDetail, bookId }) => {
   return (
     <div className="mt-4 list-container p-4">
-      <h2 className="text-[18px] font-bold">Details</h2>
+      <h2 className="text-[18px] font-bold">Chi tiết</h2>
       <div>
         <Table>
           <TableBody>
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Product code
+                Mã sản phẩm
               </TableCell>
               <TableCell>{bookId}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Supplier
+                Tên Nhà Cung Cấp
               </TableCell>
               <TableCell>{bookDetail?.supplier}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Author
+                Tác giả
               </TableCell>
               <TableCell>{bookDetail?.author}</TableCell>
             </TableRow>
 
             <TableRow className="">
-              <TableCell className="text-[var(--text)] w-[30%]">
-                Publisher
-              </TableCell>
+              <TableCell className="text-[var(--text)] w-[30%]">NXB</TableCell>
               <TableCell>{bookDetail?.publisher}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Publish Year
+                Năm XB
               </TableCell>
               <TableCell>{bookDetail?.publish_year}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Weight
+                Trọng lượng (gr)
               </TableCell>
               <TableCell>{bookDetail?.weight}</TableCell>
             </TableRow>
 
             <TableRow className="">
-              <TableCell className="text-[var(--text)] w-[30%]">Size</TableCell>
+              <TableCell className="text-[var(--text)] w-[30%]">
+                Kích Thước Bao Bì
+              </TableCell>
               <TableCell>{bookDetail?.size}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Quantity of Page
+                Số trang
               </TableCell>
               <TableCell>{bookDetail?.quantity_of_pages}</TableCell>
             </TableRow>
 
             <TableRow className="">
               <TableCell className="text-[var(--text)] w-[30%]">
-                Book Layout
+                Hình thức
               </TableCell>
               <TableCell>{bookDetail?.layout}</TableCell>
             </TableRow>
@@ -85,7 +85,7 @@ const ProductInfoDetail: React.FC<ChildProps> = ({ bookDetail, bookId }) => {
             {bookDetail?.language && (
               <TableRow className="">
                 <TableCell className="text-[var(--text)] w-[30%]">
-                  Language
+                  Ngôn ngữ
                 </TableCell>
                 <TableCell>{bookDetail?.language}</TableCell>
               </TableRow>

@@ -73,7 +73,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
         otp: otpValue,
       })
       .then(async (res) => {
-        const msg = res.data.message || "Sign up successfully!";
+        const msg = res.data.message || "Đăng ký thành công!";
         showSuccess(msg);
         setSignInMode(true);
       })
@@ -82,7 +82,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
         const errMsg =
           error.response?.data?.error ||
           error.response?.data?.message ||
-          "Failed to send OTP";
+          "Đã có lỗi";
 
         showError(errMsg);
       })
@@ -103,7 +103,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
     await axiosInstance
       .post("/auth/otp", { email })
       .then((res) => {
-        const msg = res.data.message || "OTP sent successfully!";
+        const msg = res.data.message || "OTP đã được gửi!";
         showSuccess(msg);
         setOtpMode(true);
         setIsCounting(true);
@@ -113,7 +113,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
         const errMsg =
           error.response?.data?.error ||
           error.response?.data?.message ||
-          "Failed to send OTP";
+          "Đã có lỗi khi gửi OTP";
 
         showError(errMsg);
       })
@@ -144,7 +144,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
                     <FormLabel className="mb-2 text-[lg]">Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter email"
+                        placeholder="Nhập email"
                         {...field}
                         autoComplete="current-email"
                       />
@@ -160,11 +160,11 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
+                    <FormLabel className="mb-2 text-[lg]">Mật khẩu</FormLabel>
                     <FormControl>
                       <div className="relative w-full">
                         <Input
-                          placeholder="Enter Password"
+                          placeholder="Nhập mật khẩu"
                           {...field}
                           autoComplete="current-password"
                           type={hidePassword ? "password" : "text"}
@@ -195,12 +195,12 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="mb-2 text-[lg]">
-                      Confirm password
+                      Xác nhận mật khẩu
                     </FormLabel>
                     <FormControl>
                       <div className="relative w-full">
                         <Input
-                          placeholder="Enter confirm password"
+                          placeholder="Nhập lại mật khẩu"
                           {...field}
                           autoComplete="current-confirm-password"
                           type={hideConfirmPassword ? "password" : "text"}
@@ -230,11 +230,11 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
 
           {!otpMode ? (
             <PrimaryButton
-              content="Send OTP to Email"
+              content="Gửi OTP tới Email"
               handleTodo={handleSendOtp}
             />
           ) : (
-            <PrimaryButton content="Sign up" type="submit" />
+            <PrimaryButton content="Đăng ký" type="submit" />
           )}
         </form>
       </Form>

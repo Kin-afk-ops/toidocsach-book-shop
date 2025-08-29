@@ -40,11 +40,9 @@ const HeaderSearch = () => {
     if (!value.trim()) return;
 
     addHistory(value); // lưu vào lịch sử
-    // router.push(`/search?keyword=${encodeURIComponent(value)}`);
+    router.push(`/categories/search?q=${encodeURIComponent(value)}&page=${1}`);
     setSuggestMode(false);
     setHistoryMode(false);
-
-    router.push("/");
   };
 
   const handleFocus = () => {
@@ -99,7 +97,7 @@ const HeaderSearch = () => {
           <div className="w-full flex justify-between">
             <div className="flex items-center">
               <History />
-              <p className="font-bold ml-2">Search history</p>
+              <p className="font-bold ml-2">Lịch sử tìm kiếm</p>
             </div>
             <div
               className="text-[var(--text)] hover:text-[var(--primary)] hover:underline cursor-pointer text-[14px]"
@@ -108,7 +106,7 @@ const HeaderSearch = () => {
                 clearHistory();
               }} // ngăn onBlur
             >
-              Clear All
+              Xóa tất cả
             </div>
           </div>
 
@@ -142,7 +140,7 @@ const HeaderSearch = () => {
           <div className="w-full flex justify-between">
             <div className="flex items-center">
               <History />
-              <p className="font-bold ml-2">Suggest</p>
+              <p className="font-bold ml-2">Gợi ý</p>
             </div>
           </div>
 
@@ -158,12 +156,6 @@ const HeaderSearch = () => {
                 }}
               >
                 <span className="text-[14px]">{suggest}</span>
-                <button
-                  className="flex outline-0 border-0"
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  <X size={14} />
-                </button>
               </Badge>
             ))}
           </div>

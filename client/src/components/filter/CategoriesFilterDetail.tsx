@@ -20,7 +20,7 @@ const CategoriesFilterDetail: React.FC<ChildProps> = ({ categories }) => {
             !currentCateId && "text-[var(--primary)]"
           }`}
         >
-          New book
+          Sách mới
         </Link>
       </li>
       {categories.length > 0 ? (

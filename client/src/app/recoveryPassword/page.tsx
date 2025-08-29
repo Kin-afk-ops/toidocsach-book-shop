@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { email, z } from "zod";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -26,21 +26,22 @@ const RecoveryPasswordPage = () => {
   const [disableInput, setDisableInput] = useState<boolean>(true);
   const [hidePassword, setHidePassword] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
+
   const formSchema = z.object({
     email: z
       .string()
       .nonempty({ message: "Email không được để trống." })
       .email({ message: "Email không hợp lệ." }),
-
     otpCode: z
       .string()
-      .nonempty({ message: "Mã otp không được để trống." })
-      .max(6, { message: "Mã otp phải có dài nhất 6 ký tự." }),
+      .nonempty({ message: "Mã OTP không được để trống." })
+      .max(6, { message: "Mã OTP chỉ tối đa 6 ký tự." }),
     password: z
       .string()
       .nonempty({ message: "Mật khẩu không được để trống." })
       .min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự." }),
   });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,20 +55,19 @@ const RecoveryPasswordPage = () => {
     setLoading(true);
     const email = form.getValues("email");
     if (!email) {
-      showWarning("Please enter your email");
+      showWarning("Vui lòng nhập email.");
+      setLoading(false);
       return;
     }
     await axiosInstance
-      .post("/auth/otp/recoveryPassword", {
-        email,
-      })
+      .post("/auth/otp/recoveryPassword", { email })
       .then(() => {
-        showSuccess("OTP sent successfully!");
+        showSuccess("OTP đã được gửi thành công!");
         setDisableInput(false);
       })
       .catch((error) => {
         console.log(error);
-        showError("Failed to send OTP");
+        showError("Gửi OTP thất bại. Vui lòng thử lại.");
       })
       .finally(() => setLoading(false));
   };
@@ -75,7 +75,6 @@ const RecoveryPasswordPage = () => {
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
-    // Lấy dữ liệu
     const { email, otpCode, password } = values;
 
     setLoading(true);
@@ -83,32 +82,28 @@ const RecoveryPasswordPage = () => {
       .put("auth/recoveryPassword", {
         email,
         otp: otpCode,
-        new_password: password, // sửa lại cho đúng
+        new_password: password,
       })
       .then((res) => {
-        showSuccess(res.data.message || "Password updated successfully!");
+        showSuccess(res.data.message || "Cập nhật mật khẩu thành công!");
         router.push("/");
       })
       .catch((error) => {
-        // Lấy message lỗi từ response server
         const msg =
           error.response?.data?.error ||
-          "Failed to update password. Please try again.";
+          "Cập nhật mật khẩu thất bại. Vui lòng thử lại.";
         console.log(error);
         showError(msg);
       })
-      .finally(() => {
-        setLoading(false);
-      });
-    console.log(values);
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div className="max-w-[1230px]  mx-auto px-4 py-6 flex justify-center">
+    <div className="max-w-[1230px] mx-auto px-4 py-6 flex justify-center">
       {loading && <LoadingScreen />}
       <div className="w-[40%] bg-white flex flex-col items-center rounded">
         <h1 className="uppercase py-4 font-bold text-[18px]">
-          Recovery password
+          Khôi phục mật khẩu
         </h1>
 
         <div className="flex flex-col w-full justify-center mt-2 p-4">
@@ -125,19 +120,18 @@ const RecoveryPasswordPage = () => {
                     <FormLabel className="mb-2 text-[lg]">Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter email"
+                        placeholder="Nhập email"
                         {...field}
                         autoComplete="current-email"
                       />
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
               <TransparentButton
-                content="Send OTP to Email"
+                content="Gửi OTP đến email"
                 type="button"
                 handleTodo={handleSendOtp}
               />
@@ -147,12 +141,10 @@ const RecoveryPasswordPage = () => {
                 name="otpCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">
-                      Confirm OTP code
-                    </FormLabel>
+                    <FormLabel className="mb-2 text-[lg]">Mã OTP</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="6 characters"
+                        placeholder="6 ký tự"
                         {...field}
                         autoComplete="current-otp"
                         disabled={disableInput}
@@ -168,11 +160,13 @@ const RecoveryPasswordPage = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">Password</FormLabel>
+                    <FormLabel className="mb-2 text-[lg]">
+                      Mật khẩu mới
+                    </FormLabel>
                     <FormControl>
                       <div className="relative w-full">
                         <Input
-                          placeholder="Enter Password"
+                          placeholder="Nhập mật khẩu mới"
                           {...field}
                           autoComplete="current-password"
                           disabled={disableInput}
@@ -197,7 +191,7 @@ const RecoveryPasswordPage = () => {
                 )}
               />
 
-              <PrimaryButton content="Confirm" type="submit" />
+              <PrimaryButton content="Xác nhận" type="submit" />
             </form>
           </Form>
         </div>
