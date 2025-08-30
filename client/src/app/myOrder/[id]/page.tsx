@@ -146,7 +146,7 @@ const MyOrderPage = () => {
                     order.items &&
                     order.items.map((item, index) => (
                       <TableRow
-                        key={item.id}
+                        key={index}
                         className={`${
                           index === (order.items?.length ?? 0) - 1
                             ? "border-b border-[#ccc]"
@@ -172,12 +172,12 @@ const MyOrderPage = () => {
                           </div>
                         </TableCell>
 
-                        <TableCell className="w-[340px] h-[100px] flex flex-col justify-between text-[14px] text-[var(--text)]">
+                        <TableCell className="w-[340px] h-[100px] text-[14px] text-[var(--text)] align-top">
                           <Link
                             href={`/product/${formatSlug(
                               item.book ? item.book.title : ""
                             )}.html?q=${item.book ? item.book.id : ""}`}
-                            className="text-base-normal break-words line-clamLink-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
+                            className="whitespace-normal break-words line-clamp-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
                           >
                             {item.book?.title}
                           </Link>
@@ -282,9 +282,9 @@ const MyOrderPage = () => {
 
         <div className="md:hidden space-y-4">
           {orders &&
-            orders.map((order) => (
+            orders.map((order, index) => (
               <div
-                key={order.id}
+                key={index}
                 className="border rounded-lg p-4 space-y-3 shadow-sm"
               >
                 {order.items &&

@@ -11,34 +11,49 @@ import { showError, showSuccess, showWarning } from "@/util/styles/toast-utils";
 import { useState } from "react";
 import LoadingScreen from "../loading/LoadingScreen";
 import { useCartStore } from "@/store/useCartStore";
+import { useBuyStore } from "@/store/useBuyStore";
+import { useRouter } from "next/navigation";
 
 interface ChildProps {
   images: BookImage[];
   bookId: string;
   bookQuantity: number;
+  soldCount: number;
 }
 
 const ProductAction: React.FC<ChildProps> = ({
   images,
   bookId,
   bookQuantity,
+  soldCount,
 }) => {
   const user = useAuthStore((state) => state.user);
   const setCart = useCartStore((state) => state.setCart);
   const setCartItems = useCartStore((state) => state.setCartItems);
+  const router = useRouter();
 
-  const quantityProduct = useQuantityProduct((state) => state.quantityProduct);
+  const quantityProduct = useQuantityProduct(
+    (state) => state.quantityProduct
+  ) ?? {
+    quantity: 1,
+    bookId: bookId,
+  };
   const quantityProductClear = useQuantityProduct((state) => state.clear);
   const setModal = useAuthStore((state) => state.setModal);
+  const setBook = useBuyStore((state) => state.setBook);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleAddToCart = async (): Promise<void> => {
+    if (bookQuantity === soldCount) {
+      return showWarning("Sản phẩm đã hết hàng! Mong quý khách thông cảm");
+    }
+
     if (quantityProduct?.quantity === 0) {
       return showWarning("Hãy thêm ít nhất 1 sản phẩm");
     }
 
-    if ((quantityProduct?.quantity ?? 0) > bookQuantity) {
-      return showWarning("Số lượng bạn nhập đã vượt quá số lượng sách hiện có");
+    if (quantityProduct?.quantity + soldCount > bookQuantity) {
+      return showWarning("Số lượng bạn chọn vượt quá số lượng hiện có");
     }
 
     if (!user) {
@@ -72,6 +87,32 @@ const ProductAction: React.FC<ChildProps> = ({
       })
       .finally(() => setLoading(false));
   };
+
+  const handleToBuy = () => {
+    if (bookQuantity === soldCount) {
+      return showWarning("Sản phẩm đã hết hàng! Mong quý khách thông cảm");
+    }
+
+    if (quantityProduct?.quantity === 0) {
+      return showWarning("Hãy thêm ít nhất 1 sản phẩm");
+    }
+
+    if (quantityProduct?.quantity + soldCount > bookQuantity) {
+      return showWarning("Số lượng bạn chọn vượt quá số lượng hiện có");
+    }
+
+    if (!user) {
+      showWarning("Hãy đăng nhập để mua hàng");
+      return setModal("signin");
+    }
+
+    setBook({
+      book_id: bookId,
+      quantity: quantityProduct.quantity,
+    });
+    router.push(`/buyNow/${user?.id}`);
+  };
+
   return (
     <>
       {loading && <LoadingScreen />}
@@ -88,7 +129,7 @@ const ProductAction: React.FC<ChildProps> = ({
 
           <div className="w-full sm:w-1/2">
             {" "}
-            <PrimaryButton content="Mua ngay" />
+            <PrimaryButton content="Mua ngay" handleTodo={handleToBuy} />
           </div>
         </div>
       </div>

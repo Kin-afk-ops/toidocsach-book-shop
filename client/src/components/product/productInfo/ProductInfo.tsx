@@ -11,7 +11,7 @@ interface ChildProps {
   author: string | undefined;
   publisher: string | undefined;
   layout: string | undefined;
-  sold_count: number | undefined;
+  sold_count: number;
   bookQuantity: number | undefined;
   price: number | undefined;
   discount: number | undefined;
@@ -73,7 +73,7 @@ const ProductInfo: React.FC<ChildProps> = ({
           Hiện có:
           <span className="font-bold">
             {" "}
-            {bookQuantity && bookQuantity} sản phẩm
+            {bookQuantity && bookQuantity - sold_count} sản phẩm
           </span>
         </div>
       </div>
@@ -95,58 +95,68 @@ const ProductInfo: React.FC<ChildProps> = ({
         </Badge>
       </div>
 
-      <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
-        <span className="text-base sm:text-lg font-bold">Số lượng:</span>
-        <div className="flex items-center border border-[#ccc] rounded-md w-max">
-          <button
-            className="p-2 cursor-pointer"
-            onClick={() => {
-              if (quantity > 1) {
-                setQuantity((prev) => prev - 1);
-                setQuantityProduct({
-                  bookId: bookId,
-                  quantity: quantity - 1,
-                });
-              }
-            }}
-          >
-            <Minus
-              color={`${quantity === 1 || quantity === 0 ? "gray" : "black"}`}
-            />
-          </button>
-          <input
-            className="w-12 text-center outline-0 text-sm sm:text-base"
-            type="text"
-            value={quantity.toString()} // ép sang string
-            onChange={(e) => {
-              const value = e.target.value;
-              if (/^\d*$/.test(value)) {
-                // chỉ cho số 0-9
-                setQuantity(value === "" ? 0 : Number(value));
-                setQuantityProduct({
-                  bookId: bookId,
-                  quantity: value === "" ? 0 : Number(value),
-                });
-              }
-            }}
-          />
-
-          <button
-            className="p-2 cursor-pointer"
-            onClick={() => {
-              if (quantity < totalProduct) {
-                setQuantity((prev) => prev + 1);
-                setQuantityProduct({
-                  bookId: bookId,
-                  quantity: quantity + 1,
-                });
-              }
-            }}
-          >
-            <Plus color={`${quantity === totalProduct ? "gray" : "black"}`} />
-          </button>
+      {sold_count === bookQuantity ? (
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+          <Badge className="text-lg">Đã hết hàng</Badge>
         </div>
-      </div>
+      ) : (
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+          <span className="text-base sm:text-lg font-bold">Số lượng:</span>
+          <div className="flex items-center border border-[#ccc] rounded-md w-max">
+            <button
+              className="p-2 cursor-pointer"
+              onClick={() => {
+                if (quantity > 1) {
+                  setQuantity((prev) => prev - 1);
+                  setQuantityProduct({
+                    bookId: bookId,
+                    quantity: quantity - 1,
+                  });
+                }
+              }}
+            >
+              <Minus
+                color={`${quantity === 1 || quantity === 0 ? "gray" : "black"}`}
+              />
+            </button>
+            <input
+              className="w-12 text-center outline-0 text-sm sm:text-base"
+              type="text"
+              value={quantity.toString()} // ép sang string
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  // chỉ cho số 0-9
+                  setQuantity(value === "" ? 0 : Number(value));
+                  setQuantityProduct({
+                    bookId: bookId,
+                    quantity: value === "" ? 0 : Number(value),
+                  });
+                }
+              }}
+            />
+
+            <button
+              className="p-2 cursor-pointer"
+              onClick={() => {
+                if (quantity < totalProduct - sold_count) {
+                  setQuantity((prev) => prev + 1);
+                  setQuantityProduct({
+                    bookId: bookId,
+                    quantity: quantity + 1,
+                  });
+                }
+              }}
+            >
+              <Plus
+                color={`${
+                  quantity === totalProduct - sold_count ? "gray" : "black"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

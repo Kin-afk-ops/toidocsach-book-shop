@@ -5,7 +5,7 @@ from app.services.order_service import (
     get_orders_by_user,
     get_order_by_id,
     checkout_cart,
-    update_order_status,update_order_canceled_status
+    update_order_status,update_order_canceled_status,checkout_no_cart
 )
 
 order_route = Blueprint("order_route", __name__)
@@ -61,6 +61,42 @@ def checkout(user_id):
 
     order, status = checkout_cart(user_id, client_items, receiver_data, address_data,email)
     return jsonify(order), status
+
+
+
+
+@order_route.route("/order/<uuid:user_id>/checkout_no_cart", methods=["POST"])
+@require_user
+def checkout_no_cart_route(user_id):
+    """
+    Client gửi JSON:
+    {
+        "items": [
+            {"book_id": "uuid1", "quantity": 2},
+            {"book_id": "uuid2", "quantity": 1}
+        ],
+        "receiver": {
+            "fullname": "Nguyen Van A",
+            "phone": "0912345678",
+            "note": "Giao buổi tối giúp mình"
+        },
+        "address": {
+            "country": "Vietnam",
+            "province": "Hà Nội",
+            "ward": "Ba Đình",
+            "address": "123 Đường A"
+        }
+    }
+    """
+    data = request.get_json()
+    client_items = data.get("items", {})
+    receiver_data = data.get("receiver", {})
+    address_data = data.get("address", {})
+    email = data.get("email")
+
+    order, status = checkout_no_cart(user_id, client_items, receiver_data, address_data,email)
+    return jsonify(order), status
+
 
 
 @order_route.route("/order/<uuid:order_id>/status", methods=["PUT"])

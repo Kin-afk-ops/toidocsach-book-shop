@@ -5,6 +5,7 @@ interface HistoryState {
   history: string[];
   setHistory: (history: string[]) => void;
   addHistory: (item: string) => void;
+  removeHistory: (item: string) => void;
   clear: () => void;
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
@@ -15,6 +16,13 @@ export const useHistoryStore = create<HistoryState>()(
     (set, get) => ({
       history: [],
       setHistory: (history) => set({ history }),
+      removeHistory: (item: string) => {
+        const state = get();
+        let history = state.history ?? [];
+
+        history = history.filter((h) => h !== item); // loại bỏ phần tử
+        set({ history });
+      },
       addHistory: (item: string) => {
         const state = get();
         let history = state.history ?? [];

@@ -7,6 +7,7 @@ import { Badge } from "../ui/badge";
 import { useHistoryStore } from "@/store/useHistoryStore";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { useRouter } from "next/navigation";
+import formatSlug from "@/util/formatSlug";
 
 const HeaderSearch = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const HeaderSearch = () => {
   const histories = useHistoryStore((state) => state.history);
   const addHistory = useHistoryStore((state) => state.addHistory);
   const clearHistory = useHistoryStore((state) => state.clear);
+  const removeHistory = useHistoryStore((state) => state.removeHistory);
 
   const handleSuggest = async (value: string) => {
     if (!value.trim()) return;
@@ -40,7 +42,7 @@ const HeaderSearch = () => {
     if (!value.trim()) return;
 
     addHistory(value); // lưu vào lịch sử
-    router.push(`/categories/search?q=${encodeURIComponent(value)}&page=${1}`);
+    router.push(`/categories/search?q=${formatSlug(value)}&page=${1}`);
     setSuggestMode(false);
     setHistoryMode(false);
   };
@@ -95,9 +97,10 @@ const HeaderSearch = () => {
       </Button>
 
       {/* History Dropdown */}
+
       {historyMode && histories && histories.length > 0 && (
         <div
-          className="absolute bg-white top-[100%] left-0 w-full rounded-[5px] p-4 z-10"
+          className="absolute bg-white top-[100%] border border-[#ccc] left-0 w-full rounded-[5px] p-4 z-50"
           onMouseDown={(e) => e.preventDefault()}
         >
           <div className="w-full flex justify-between">
@@ -110,7 +113,7 @@ const HeaderSearch = () => {
               onMouseDown={(e) => {
                 e.preventDefault();
                 clearHistory();
-              }} // ngăn onBlur
+              }}
             >
               Xóa tất cả
             </div>
@@ -121,16 +124,22 @@ const HeaderSearch = () => {
               <Badge
                 key={index}
                 variant="secondary"
-                className="flex items-center cursor-pointer"
+                className="flex items-center cursor-pointer "
                 onMouseDown={(e) => {
                   e.preventDefault(); // ngăn blur
                   handleSearch(item);
                 }}
               >
-                <span className="text-[14px]">{item}</span>
+                <span className="text-[14px] whitespace-normal break-words line-clamp-1">
+                  {item}
+                </span>
                 <button
-                  className="flex outline-0 border-0"
-                  onMouseDown={(e) => e.stopPropagation()}
+                  className="flex outline-0 border-0 cursor-pointer"
+                  onMouseDown={(e) => {
+                    e.stopPropagation(); // ngăn trigger click badge
+                    e.preventDefault(); // ngăn blur input
+                    removeHistory(item); // gọi store để xóa
+                  }}
                 >
                   <X size={14} />
                 </button>
@@ -142,7 +151,7 @@ const HeaderSearch = () => {
 
       {/* Suggest Dropdown */}
       {suggestMode && suggestList.length > 0 && (
-        <div className="absolute bg-white top-[100%] left-0 w-full rounded-[5px] p-4 z-10">
+        <div className="absolute bg-white top-[100%]  border border-[#ccc] left-0 w-full rounded-[5px] p-4 z-50">
           <div className="w-full flex justify-between">
             <div className="flex items-center">
               <History />
@@ -155,13 +164,15 @@ const HeaderSearch = () => {
               <Badge
                 key={index}
                 variant="secondary"
-                className="flex items-center cursor-pointer"
+                className="flex items-center cursor-pointer "
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSearch(suggest);
                 }}
               >
-                <span className="text-[14px]">{suggest}</span>
+                <span className="text-[14px] whitespace-normal break-words line-clamp-1">
+                  {suggest}
+                </span>
               </Badge>
             ))}
           </div>

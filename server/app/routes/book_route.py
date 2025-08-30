@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service,get_home_books_service,get_list_books_service,get_books_by_category_service
+from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service,get_home_books_service,get_list_books_service,get_books_by_category_service,get_book_item_by_id
 import math
 book_route = Blueprint("book", __name__)
 
@@ -54,6 +54,16 @@ def get_list_books():
         }), status_code
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@book_route.route("/bookItems/<uuid:book_id>", methods=["GET"])
+def get_book_item(book_id):
+    book, error = get_book_item_by_id(book_id)
+    if error:
+        return jsonify({"error": error}), 404
+
+    return jsonify(book.to_dict(include_detail=True, include_category=True)), 200
+   
     
 
 @book_route.route("/book/category/<uuid:category_id>", methods=["GET"])

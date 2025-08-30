@@ -45,7 +45,7 @@ def get_all_categories_service():
 def get_category_service(category_id):
     category = Category.query.get(category_id)
     if not category:
-        return {"error": "Category not found"}, 404
+        return {"error": "Không tìm thấy danh mục"}, 404
     return category.to_dict(), 200
 
 
@@ -53,7 +53,7 @@ def get_category_service(category_id):
 def update_category_service(category_id, data):
     category = Category.query.get(category_id)
     if not category:
-        return {"error": "Category not found"}, 404
+        return {"error": "Không tìm thấy danh mục"}, 404
 
     title = data.get("title")
     image = data.get("image")
@@ -71,8 +71,8 @@ def update_category_service(category_id, data):
 def delete_category_service(category_id):
     category = Category.query.get(category_id)
     if not category:
-        return {"error": "Category not found"}, 404
+        return {"error": "Không tìm thấy danh mục"}, 404
 
     db.session.delete(category)
     db.session.commit()
-    return {"message": "Category deleted successfully"}, 200
+    return {"message": "Xóa danh mục thành công"}, 200

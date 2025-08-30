@@ -34,10 +34,10 @@ def add_to_cart(user_id, book_id, quantity=1):
 def update_cart_item(user_id, book_id, quantity):
     cart = Cart.query.filter_by(user_id=user_id).first()
     if not cart:
-        return {"error": "Cart not found"}, 404
+        return {"error": "Không tìm thấy giỏ hàng"}, 404
     item = CartItem.query.filter_by(cart_id=cart.id, book_id=book_id).first()
     if not item:
-        return {"error": "Item not found in cart"}, 404
+        return {"error": "Sản phẩm không nằm trong giỏ hàng"}, 404
 
     if quantity <= 0:
         db.session.delete(item)
@@ -51,14 +51,14 @@ def update_cart_item(user_id, book_id, quantity):
 def remove_from_cart(user_id, book_id):
     cart = Cart.query.filter_by(user_id=user_id).first()
     if not cart:
-        return {"message": "Cart not found"}, 404
+        return {"message": "Không tìm thấy giỏ hàng"}, 404
     item = CartItem.query.filter_by(cart_id=cart.id, book_id=book_id).first()
     if not item:
-        return {"error": "Item not found in cart"}, 404
+        return {"error": "Sản phẩm không nằm trong giỏ hàng"}, 404
 
     db.session.delete(item)
     db.session.commit()
-    return {"message": "Item removed successfully"}, 200
+    return {"message": "Xóa sản phẩm ra giỏ hàng thành công!"}, 200
 
 
 def clear_cart(user_id):
@@ -66,4 +66,4 @@ def clear_cart(user_id):
     for item in cart.items:
         db.session.delete(item)
     db.session.commit()
-    return {"message": "Cart cleared"}, 200
+    return {"message": "Đã xóa giỏ hàng!"}, 200

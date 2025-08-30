@@ -4,6 +4,7 @@ import ListPagination from "@/components/list/ListPagination";
 import LoadingScreen from "@/components/loading/LoadingScreen";
 import { BookItemInterface } from "@/interface/book.i";
 import axiosInstance from "@/lib/api/axiosInstance";
+import slugToText from "@/util/slugToText";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -48,11 +49,14 @@ const ListPage = () => {
     const fetchSearchBook = async (): Promise<void> => {
       setLoading(true);
       try {
-        const res = await axiosInstance.post(`/search`, {
-          keyword: currentCateId,
-          page: page,
-        });
-        setBookResult(res?.data);
+        if (currentCateId) {
+          const res = await axiosInstance.post(`/search`, {
+            keyword: slugToText(currentCateId),
+            page: page,
+          });
+          setBookResult(res?.data);
+          console.log(slugToText(currentCateId));
+        }
       } catch (error) {
         console.log(error);
       } finally {

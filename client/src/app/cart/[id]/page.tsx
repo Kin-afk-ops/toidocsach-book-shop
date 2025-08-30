@@ -16,43 +16,24 @@ const CartPage = () => {
   const userId = params.id;
   const cartItems = useCartStore((state) => state.cartItems);
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [cartItemsPage, setCartItemsPage] = useState<CartItemWithCheck[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [grandTotal, setGrandTotal] = useState(0);
 
   useEffect(() => {
-    const fetchCart = async (): Promise<void> => {
-      try {
-        // giả lập thời gian loading (cho đẹp UX)
-        await new Promise((resolve) => setTimeout(resolve, 800));
+    if (!cartItems) return;
 
-        if (cartItems) {
-          setCartItemsPage(
-            cartItems.map((item: CartItemInterface) => ({
-              ...item,
-              checked: false,
-            }))
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false); // tắt loading khi xong
-      }
-    };
-    fetchCart();
-  }, [cartItems]);
-
-  const handleGrandTotal = () => {
-    return cartItemsPage.reduce((total, item) => {
-      if (!item.book) return total;
+    const total = cartItems.reduce((sum, item) => {
+      if (!item.book || !item.checked) return sum;
 
       const { price, discount } = item.book;
       const finalPrice =
         price && discount ? price - (price * discount) / 100 : price ?? 0;
 
-      return total + finalPrice * item.quantity;
+      return sum + finalPrice * item.quantity;
     }, 0);
-  };
+
+    setGrandTotal(total);
+  }, [cartItems]);
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -78,12 +59,8 @@ const CartPage = () => {
 
       <div className="max-w-[1230px] grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 mx-auto px-4 py-6">
         <div className="col-span-1">
-          {cartItemsPage.length !== 0 ? (
-            <CartTable
-              data={cartItemsPage}
-              setData={setCartItemsPage}
-              setLoading={setLoading}
-            />
+          {cartItems.length !== 0 ? (
+            <CartTable setLoading={setLoading} />
           ) : (
             <div className="list-container flex flex-col items-center justify-center w-full py-6">
               <Image
@@ -106,7 +83,7 @@ const CartPage = () => {
               <div className="flex justify-between items-center pb-6">
                 <p className="text-[16px] font-bold">Tổng cộng</p>
                 <p className="text-2xl text-[var(--primary)] font-bold">
-                  {formatPrice(handleGrandTotal())}
+                  {formatPrice(grandTotal)}
                 </p>
               </div>
 

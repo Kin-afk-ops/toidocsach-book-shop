@@ -45,12 +45,10 @@ import Link from "next/link";
 import formatSlug from "@/util/formatSlug";
 
 interface ChildProps {
-  data: CartItemInterface[];
-  setData: React.Dispatch<React.SetStateAction<CartItemWithCheck[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
+const CartTable: React.FC<ChildProps> = ({ setLoading }) => {
   const user = useAuthStore((state) => state.user);
   const cartItems = useCartStore((state) => state.cartItems);
   const setCartItems = useCartStore((state) => state.setCartItems);
@@ -83,10 +81,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
             setCartItems(updatedItems);
           }
         }
-
-        setData((prevData) =>
-          prevData.filter((data) => data.book?.id !== bookDelete.id)
-        );
       })
       .catch((error) => {
         console.log(error);
@@ -106,10 +100,6 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
     newQuantity: number,
     item: CartItemWithCheck
   ) => {
-    setData((prev) =>
-      prev.map((p) => (p.id === item.id ? { ...p, quantity: newQuantity } : p))
-    );
-
     setCartItems(
       cartItems.map((p) =>
         p.id === item.id ? { ...p, quantity: newQuantity } : p
@@ -166,7 +156,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
     {
       id: "image",
-      header: `Tất cả (${data.length} sản phẩm)`,
+      header: `Tất cả (${cartItems.length} sản phẩm)`,
       cell: ({ row }) => {
         const item = row.original;
 
@@ -193,7 +183,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               href={`/product/${formatSlug(
                 item.book ? item.book?.title : ""
               )}.html?q=${item.book ? item.book?.id : ""}`}
-              className="text-base-normal break-words line-clamp-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
+              className="whitespace-normal break-words line-clamp-2 text-justify w-full hover:underline hover:decoration-2 hover:decoration-[var(--text)] hover:underline-offset-2 transition-all duration-200"
             >
               {item.book?.title}
             </Link>

@@ -21,9 +21,11 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Province, Ward } from "@/interface/address.i";
+import { BookItemInterface } from "@/interface/book.i";
 import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
 import { getProvinces, getWards } from "@/lib/api/addressApi";
 import axiosInstance from "@/lib/api/axiosInstance";
+import { useBuyStore } from "@/store/useBuyStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useUserStore";
 import { formatPrice } from "@/util/formatPrice ";
@@ -35,16 +37,30 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const OrderPage = () => {
+const BuyNowPage = () => {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const userId = params.id;
   const [loading, setLoading] = useState<boolean>(true);
-  const cartItems = useCartStore((state) => state.cartItems);
-  const setCartItems = useCartStore((state) => state.setCartItems);
-  const setCart = useCartStore((state) => state.setCart);
-  const clear = useCartStore((state) => state.clear);
+  const book = useBuyStore((state) => state.book);
+  const clear = useBuyStore((state) => state.clear);
   const user = useAuthStore((state) => state.user);
+  const [bookItems, setBookItems] = useState<BookItemInterface | null>(null);
+
+  useEffect(() => {
+    const fetchBookItems = async () => {
+      try {
+        const res = await axiosInstance.get(`/bookItems/${book?.book_id}`);
+        setBookItems(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (book) {
+      fetchBookItems();
+    }
+  }, [book]);
 
   const formSchema = z.object({
     fullname: z.string().nonempty({ message: "Họ tên không được để trống." }),
@@ -80,17 +96,12 @@ const OrderPage = () => {
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
     const formInfo = values;
-    const checkedItems = cartItems
-      .filter((item) => item.checked)
-      .map(({ book_id, quantity }) => ({
-        book_id,
-        quantity,
-      }));
+
     if (!userId) return;
     setLoading(true);
     await axiosInstance
-      .post(`/order/${userId}/checkout`, {
-        items: checkedItems,
+      .post(`/order/${userId}/checkout_no_cart`, {
+        items: book,
         receiver: {
           fullname: formInfo.fullname,
           phone: formInfo.phone,
@@ -107,20 +118,8 @@ const OrderPage = () => {
       })
       .then((res) => {
         showSuccess(res?.data.message);
-        const cart = res?.data.cart;
         console.log(res.data);
-
-        if (cart) {
-          setCart(cart);
-          setCartItems(
-            cart?.items.map((item: CartItemInterface) => ({
-              ...item,
-              checked: false,
-            }))
-          );
-        } else {
-          clear();
-        }
+        clear();
         router.push(`/myOrder/${userId}`);
       })
       .catch((error) => {
@@ -135,7 +134,6 @@ const OrderPage = () => {
       .finally(() => setLoading(false));
   };
 
-  const [cartChecks, setCartChecks] = useState<CartItemWithCheck[]>([]);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
 
@@ -149,27 +147,6 @@ const OrderPage = () => {
     };
     fetchProvinces();
   }, [form]);
-
-  useEffect(() => {
-    const getCartChecks = async (): Promise<void> => {
-      const checks = cartItems.filter((item) => item.checked === true);
-      setCartChecks(checks);
-    };
-
-    getCartChecks();
-  }, [cartItems]);
-
-  const handleGrandTotal = () => {
-    return cartChecks.reduce((total, item) => {
-      if (!item.book) return total;
-
-      const { price, discount } = item?.book;
-      const finalPrice =
-        price && discount ? price - (price * discount) / 100 : price ?? 0;
-
-      return total + finalPrice * item.quantity;
-    }, 0);
-  };
 
   return (
     <>
@@ -501,67 +478,56 @@ const OrderPage = () => {
                   <div className="hidden md:block">
                     <Table>
                       <TableBody>
-                        {cartChecks.length > 0 ? (
-                          cartChecks.map((cartCheck) => (
-                            <TableRow key={cartCheck.id}>
-                              <TableCell>
-                                <Image
-                                  src={
-                                    cartCheck.book
-                                      ? cartCheck.book.images[0].image_url
-                                      : ""
-                                  }
-                                  alt={
-                                    cartCheck.book
-                                      ? cartCheck.book?.images[0]
-                                          .image_public_id
-                                      : "image"
-                                  }
-                                  width={100}
-                                  height={100}
-                                  className="object-contain"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <div className="w-[260px] h-[119px] flex flex-col justify-between text-[14px] text-[var(--text)]">
-                                  <p className="whitespace-normal break-words line-clamp-2 text-justify w-full">
-                                    {cartCheck.book ? cartCheck.book.title : ""}
-                                  </p>
-                                </div>
-                              </TableCell>
-                              <TableCell className="flex items-center flex-col">
-                                <p className="text-[16px] line-[16px]">
-                                  {cartCheck.book
-                                    ? formatPrice(
-                                        cartCheck.book.price -
-                                          (cartCheck.book.price *
-                                            cartCheck.book.discount) /
-                                            100
-                                      )
-                                    : "0"}
+                        {bookItems ? (
+                          <TableRow>
+                            <TableCell>
+                              <Image
+                                src={
+                                  bookItems.images
+                                    ? bookItems.images[0].image_url
+                                    : ""
+                                }
+                                alt={
+                                  bookItems.images
+                                    ? bookItems.images[0].image_public_id
+                                    : "image"
+                                }
+                                width={100}
+                                height={100}
+                                className="object-contain"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="w-[260px] h-[119px] flex flex-col justify-between text-[14px] text-[var(--text)]">
+                                <p className="whitespace-normal break-words line-clamp-2 text-justify w-full">
+                                  {bookItems.title}
                                 </p>
-                                <p className="line-through">
-                                  {cartCheck.book
-                                    ? formatPrice(cartCheck.book.price)
-                                    : "0"}
-                                </p>
-                              </TableCell>
-                              <TableCell className="text-center align-top">
-                                {cartCheck.quantity}
-                              </TableCell>
-                              <TableCell className="text-center align-top font-bold text-[var(--primary)]">
-                                {cartCheck.book
-                                  ? formatPrice(
-                                      (cartCheck.book.price -
-                                        (cartCheck.book.price *
-                                          cartCheck.book.discount) /
-                                          100) *
-                                        cartCheck.quantity
-                                    )
-                                  : "0"}
-                              </TableCell>
-                            </TableRow>
-                          ))
+                              </div>
+                            </TableCell>
+                            <TableCell className="flex items-center flex-col">
+                              <p className="text-[16px] line-[16px]">
+                                {formatPrice(
+                                  bookItems.price -
+                                    (bookItems.price * bookItems.discount) / 100
+                                )}
+                              </p>
+                              <p className="line-through">
+                                {formatPrice(bookItems.price)}
+                              </p>
+                            </TableCell>
+                            <TableCell className="text-center align-top">
+                              {book && book.quantity}
+                            </TableCell>
+                            <TableCell className="text-center align-top font-bold text-[var(--primary)]">
+                              {book?.quantity &&
+                                formatPrice(
+                                  (bookItems.price -
+                                    (bookItems.price * bookItems.discount) /
+                                      100) *
+                                    book.quantity
+                                )}
+                            </TableCell>
+                          </TableRow>
                         ) : (
                           <TableRow></TableRow>
                         )}
@@ -570,14 +536,11 @@ const OrderPage = () => {
                   </div>
 
                   <div className="space-y-4 md:hidden mt-4">
-                    {cartChecks.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex gap-4 p-4 border rounded-lg shadow-sm"
-                      >
+                    {bookItems && (
+                      <div className="flex gap-4 p-4 border rounded-lg shadow-sm">
                         <Image
-                          src={item.book ? item.book.images[0].image_url : ""}
-                          alt={item.book ? item.book.title : "Sách"}
+                          src={bookItems ? bookItems.images[0].image_url : ""}
+                          alt={bookItems ? bookItems.title : "Sách"}
                           width={80}
                           height={80}
                           className="object-contain w-[80px] h-[80px]"
@@ -586,42 +549,42 @@ const OrderPage = () => {
                         <div className="flex flex-col justify-between flex-1 text-sm">
                           {/* Tên sách */}
                           <p className="font-medium line-clamp-2 text-[14px]">
-                            {item.book?.title}
+                            {bookItems.title}
                           </p>
 
                           {/* Giá */}
                           <div className="flex items-center gap-2">
                             <p className="text-red-600 font-bold">
-                              {item.book
+                              {bookItems
                                 ? formatPrice(
-                                    item.book.price -
-                                      (item.book.price * item.book.discount) /
+                                    bookItems.price -
+                                      (bookItems.price * bookItems.discount) /
                                         100
                                   )
                                 : "0"}
                             </p>
                             <p className="text-gray-400 line-through text-xs">
-                              {formatPrice(item.book?.price ?? 0)}
+                              {formatPrice(bookItems?.price ?? 0)}
                             </p>
                           </div>
 
                           {/* SL + Tổng */}
                           <div className="flex justify-between items-center mt-1">
-                            <span>Số lượng: {item.quantity}</span>
+                            <span>Số lượng: {book && book.quantity}</span>
                             <span className="font-bold text-[var(--primary)]">
-                              {item.book
+                              {book && bookItems
                                 ? formatPrice(
-                                    (item.book.price -
-                                      (item.book.price * item.book.discount) /
+                                    (bookItems.price -
+                                      (bookItems.price * bookItems.discount) /
                                         100) *
-                                      item.quantity
+                                      book.quantity
                                   )
                                 : "0"}
                             </span>
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
 
                   <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
@@ -630,7 +593,13 @@ const OrderPage = () => {
                         Tổng đơn hàng:{" "}
                       </span>
                       <span className="ml-2 text-[18px] md:text-[20px] font-bold text-[var(--primary)]">
-                        {formatPrice(handleGrandTotal())}
+                        {book && bookItems
+                          ? formatPrice(
+                              (bookItems.price -
+                                (bookItems.price * bookItems.discount) / 100) *
+                                book.quantity
+                            )
+                          : "0"}
                       </span>
                     </div>
                     <div className="w-full md:w-[50%]">
@@ -650,4 +619,4 @@ const OrderPage = () => {
   );
 };
 
-export default OrderPage;
+export default BuyNowPage;

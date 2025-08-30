@@ -129,14 +129,26 @@ def get_book_by_id_service(book_id: str):
 
 
 
+def get_book_item_by_id(book_id: str):
+    """
+    Lấy BookItem theo ID
+    """
+    try:
+        book = BookItem.query.get(book_id)
+        if not book:
+            return None, "Không tìm thấy sách với id này"
+        return book, None
+    except Exception as e:
+        return None, str(e)
+
 def update_book_category_service(book_id, category_id):
     book = BookItem.query.get(book_id)
     if not book:
-        return {"error": "Book not found"}, 404
+        return {"error": "Không tìm thấy sách"}, 404
 
     category = Category.query.get(category_id)
     if not category:
-        return {"error": "Category not found"}, 404
+        return {"error": "Không tìm thấy danh mục"}, 404
 
     book.category_id = category.id
     db.session.commit()

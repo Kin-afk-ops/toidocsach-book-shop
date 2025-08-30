@@ -121,6 +121,7 @@ def checkout_cart(user_id, client_items, receiver_data, address_data,email):
         cart_item.quantity -= quantity
         if cart_item.quantity <= 0:
             db.session.delete(cart_item)
+        book.sold_count += quantity
 
     order.amount = total_amount
 
@@ -143,6 +144,74 @@ def checkout_cart(user_id, client_items, receiver_data, address_data,email):
     return {
         "message": "Đã tạo đơn hàng thành công",
         "cart": current_cart
+    }, 200
+
+
+
+def checkout_no_cart(user_id, client_items, receiver_data, address_data, email):
+    if not client_items:
+        return {"error": "No items to checkout"}, 400
+
+    # Tạo Order kèm thông tin người nhận + địa chỉ
+    order = Order(
+        user_id=user_id,
+        fullname=receiver_data.get("fullname"),
+        phone=receiver_data.get("phone"),
+        note=receiver_data.get("note"),
+        payment_method=receiver_data.get("payment_method"),
+        country=address_data.get("country", "Vietnam"),
+        province=address_data.get("province"),
+        ward=address_data.get("ward"),
+        address=address_data.get("address"),
+        status="pending"
+    )
+
+    total_amount = 0
+
+    book_id = client_items.get("book_id")
+    quantity = client_items.get("quantity", 1)
+
+    book = BookItem.query.get(book_id)
+    if not book:
+        return {"error": f"Book with id {book_id} not found"}, 404
+
+    # Nếu số lượng yêu cầu > tồn kho → trả lỗi
+    if quantity > (book.quantity - book.sold_count):
+        return {"error": f"Sản phẩm {book.title} không đủ số lượng"}, 400
+
+    # Giá sau discount
+    final_price = book.price - (book.price * book.discount / 100) if book.discount else book.price
+
+    # Tạo OrderItem
+    order_item = OrderItem(
+        book_id=book.id,
+        quantity=quantity,
+        price=final_price
+    )
+    order.items.append(order_item)
+
+    # Cộng tổng tiền
+    total_amount += final_price * quantity
+
+    # Trừ số lượng tồn kho, tăng sold_count
+    book.sold_count += quantity
+    # (option: book.quantity -= quantity nếu quantity là số tồn hiện có thay vì tổng ban đầu)
+
+    order.amount = total_amount
+
+    db.session.add(order)
+    db.session.commit()
+
+    # Gửi email xác nhận
+    try:
+        send_order_confirmation_email(order, email)
+    except Exception as e:
+        print("Gửi email xác nhận đơn hàng thất bại:", e)
+
+    return {
+        "message": "Đã tạo đơn hàng thành công (Mua ngay)",
+        "order_id": str(order.id),
+        "amount": total_amount,
     }, 200
 
 

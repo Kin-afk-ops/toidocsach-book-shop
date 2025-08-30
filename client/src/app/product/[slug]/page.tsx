@@ -56,6 +56,7 @@ const ProductPage = async ({ searchParams }: ProductPageProps) => {
             images={bookData.images}
             bookId={bookId}
             bookQuantity={bookData.quantity}
+            soldCount={bookData.sold_count}
           />
         </div>
       </div>

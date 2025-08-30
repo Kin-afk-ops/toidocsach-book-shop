@@ -5,7 +5,7 @@ def delete_user_service(user_id):
     try:
         user = User.query.get(user_id)
         if not user:
-            return {"success": False, "error": "User not found"}
+            return {"success": False, "error": "Không tìm thấy người dùng"}
 
         db.session.delete(user)
         db.session.commit()

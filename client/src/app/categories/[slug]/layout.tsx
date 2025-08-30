@@ -27,7 +27,7 @@ export default function ListLayout({
       {/* Sidebar filter */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-lg p-4 transform 
+          fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-lg p-4 transform 
           transition-transform duration-300 ease-in-out 
           ${openFilter ? "translate-x-0" : "-translate-x-full"}
           md:static md:translate-x-0 md:w-64 md:shrink-0 md:shadow-none

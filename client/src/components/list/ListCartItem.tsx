@@ -75,7 +75,7 @@ const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
             ></div>
 
             <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-white">
-              Sold {bookItem.sold_count}
+              Đã bán {bookItem.sold_count}
             </div>
           </div>
         </CardFooter>
