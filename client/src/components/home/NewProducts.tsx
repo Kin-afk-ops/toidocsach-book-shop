@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import Image from "next/image";
-import { Badge } from "../ui/badge";
+
 import HomeCartItem from "./HomeCartItem";
 import TransparentButton from "../customs/TransparentButton";
 import Link from "next/link";

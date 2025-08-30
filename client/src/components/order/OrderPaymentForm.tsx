@@ -10,15 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "../ui/input";
-import PrimaryButton from "../customs/PrimaryButton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import Image from "next/image";
 

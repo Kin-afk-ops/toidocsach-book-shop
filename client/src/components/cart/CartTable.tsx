@@ -2,15 +2,12 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
-  VisibilityState,
 } from "@tanstack/react-table";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
@@ -25,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/util/formatPrice ";
 import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
@@ -42,7 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
-import { BookInterface, BookItemInterface } from "@/interface/book.i";
+import { BookInterface } from "@/interface/book.i";
 import { useCartStore } from "@/store/useCartStore";
 import Link from "next/link";
 import formatSlug from "@/util/formatSlug";
@@ -138,7 +135,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
   const columns: ColumnDef<CartItemWithCheck>[] = [
     {
       id: "select",
-      header: ({ table }) => {
+      header: () => {
         const allChecked = cartItems?.every((item) => item.checked) ?? false;
         const someChecked =
           cartItems?.some((item) => item.checked) && !allChecked;
@@ -247,7 +244,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
                 if (/^\d*$/.test(value)) {
                   const parsed = value === "" ? 0 : Number(value);
                   if (parsed >= 1 && parsed <= bookQuantity) {
-                    updateQuantity(parsed);
+                    updateQuantity(parsed, item);
                   }
                 }
               }}

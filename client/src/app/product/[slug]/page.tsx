@@ -5,13 +5,23 @@ import ProductInfoDetail from "@/components/product/productInfo/ProductInfoDetai
 import { BookInterface } from "@/interface/book.i";
 
 interface ProductPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ q?: string }>;
 }
 
 const ProductPage = async ({ searchParams }: ProductPageProps) => {
+  // Lấy bookId từ query param 'q'
   const query = await searchParams;
-  const bookId = (query?.q as string) ?? "";
+
+  const bookId = query?.q ?? ""; // fallback là "" nếu không có q
+
+  if (!bookId) {
+    return (
+      <div className="max-w-[1230px] mx-auto px-4 py-6 text-center text-red-500 font-medium">
+        Không tìm thấy sách. Vui lòng thử lại sau.
+      </div>
+    );
+  }
 
   let bookData: BookInterface | null = null;
 
@@ -53,7 +63,7 @@ const ProductPage = async ({ searchParams }: ProductPageProps) => {
       <div>
         <ProductInfo
           title={bookData.title}
-          supplier={bookData?.detail.publisher}
+          supplier={bookData.detail.publisher}
           author={bookData.detail.author}
           publisher={bookData.detail.publisher}
           layout={bookData.detail.layout}
@@ -63,8 +73,8 @@ const ProductPage = async ({ searchParams }: ProductPageProps) => {
           discount={bookData.discount}
           bookId={bookId}
         />
-        <ProductInfoDetail bookDetail={bookData?.detail} bookId={bookId} />
-        <ProductDescription description={bookData?.detail.description} />
+        <ProductInfoDetail bookDetail={bookData.detail} bookId={bookId} />
+        <ProductDescription description={bookData.detail.description} />
       </div>
     </div>
   );

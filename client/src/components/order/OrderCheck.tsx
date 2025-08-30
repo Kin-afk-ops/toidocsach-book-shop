@@ -1,14 +1,6 @@
 "use client";
 import Image from "next/image";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import PrimaryButton from "../customs/PrimaryButton";
 import { useCartStore } from "@/store/useCartStore";
 import { CartItemWithCheck } from "@/interface/cart.i";

@@ -9,7 +9,7 @@ const ProductDescription: React.FC<ChildProps> = ({ description }) => {
   const [fullDescMode, setFullDescMode] = useState<boolean>(false);
   return (
     <div className="mt-4 list-container p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl font-bold">Description</h2>
+      <h2 className="text-lg sm:text-xl font-bold">Mô tả sản phẩm</h2>
 
       <div
         className={`relative text-[14px] sm:text-[15px] text-justify leading-[25px] sm:leading-[28px] text-[var(--text)] mt-4 transition-all duration-300`}
@@ -40,7 +40,7 @@ const ProductDescription: React.FC<ChildProps> = ({ description }) => {
           variant="secondary"
           className="text-[#2489F4] cursor-pointer mt-2"
         >
-          {fullDescMode ? "View less" : "View more"}
+          {fullDescMode ? "Thu gọn" : "Xem thêm"}
         </Button>
       </div>
     </div>

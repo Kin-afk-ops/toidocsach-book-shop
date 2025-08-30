@@ -14,8 +14,12 @@ order_route = Blueprint("order_route", __name__)
 @order_route.route("/order/<uuid:user_id>", methods=["GET"])
 @require_user
 def get_orders(user_id):
-    orders = get_orders_by_user(user_id)
-    return jsonify(orders), 200
+    # Lấy query params
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
+
+    paginated_orders = get_orders_by_user(user_id, page, per_page)
+    return jsonify(paginated_orders), 200
 
 
 @order_route.route("/order/<uuid:order_id>", methods=["GET"])

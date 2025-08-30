@@ -1,9 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Facebook, Youtube, Twitter, Mail, Phone, MapPin } from "lucide-react";
-
-import FooterAccount from "./FooterAccount";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -40,7 +38,7 @@ const Footer = () => {
                 <ul className="space-y-2">
                   <li>
                     <Link
-                      href="/about-toidocsach"
+                      href="/gioi-thieu"
                       className="hover:text-primary transition-colors"
                     >
                       Giới thiệu về <b>Toidocsach</b>

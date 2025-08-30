@@ -80,7 +80,6 @@ const OrderPage = () => {
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
     const formInfo = values;
-    const amount = handleGrandTotal();
     const checkedItems = cartItems
       .filter((item) => item.checked)
       .map(({ book_id, quantity }) => ({

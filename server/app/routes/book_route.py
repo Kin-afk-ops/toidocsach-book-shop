@@ -7,7 +7,7 @@ book_route = Blueprint("book", __name__)
 def add_book():
     # Nhận form-data từ request
     files = request.files.getlist("files")  # input name="files"
-    data = request.form.to_dict()
+    data = request.json
     data["files"] = files
 
     try:

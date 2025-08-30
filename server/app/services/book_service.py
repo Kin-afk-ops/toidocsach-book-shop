@@ -8,15 +8,17 @@ from app.services.cloudinary_service import upload_images_to_cloudinary
 def create_book_service(data):
     title = data.get("title")
     price = data.get("price")
-    files = data.get("files", [])
+    # files = data.get("files", [])
+    images_links = data.get("images", []) 
 
     if not title or price is None:
         return {"error": "Thiếu title hoặc price"}, 400
 
     # Upload ảnh nếu có
-    images = data.get("images", [])
-    if files:
-        images = upload_images_to_cloudinary(files)
+    # images = data.get("images", [])
+    # if files:
+    #     images = upload_images_to_cloudinary(files)
+    images = [{"image_url": url, "image_public_id": "upload_by_link"} for url in images_links]
 
     # Tạo BookItem
     book_item = BookItem(

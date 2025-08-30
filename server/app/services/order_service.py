@@ -5,9 +5,19 @@ from app.models.book_item_model import BookItem
 from app.utils.send_email import send_email
 
 
-def get_orders_by_user(user_id):
-    orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
-    return [order.to_dict(include_items=True) for order in orders]
+def get_orders_by_user(user_id, page=1, per_page=10):
+    # Sử dụng paginate của Flask-SQLAlchemy
+    pagination = Order.query.filter_by(user_id=user_id)\
+        .order_by(Order.created_at.desc())\
+        .paginate(page=page, per_page=per_page, error_out=False)
+
+    orders = [order.to_dict(include_items=True) for order in pagination.items]
+
+    return {
+        "orders": orders,
+        "current_page": pagination.page,
+        "total_page": pagination.pages,
+    }
 
 
 def get_order_by_id(order_id):

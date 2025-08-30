@@ -32,18 +32,13 @@ const OtpBlock: React.FC<ChildProps> = ({
       setIsCounting(false);
     }
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCounting, timeLeft]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s < 10 ? "0" : ""}${s}`;
-  };
-
-  const handleSendOtp = () => {
-    // TODO: gọi API gửi OTP
-    setTimeLeft(300);
-    setIsCounting(true);
   };
 
   return (

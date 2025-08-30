@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import PrimaryButton from "../customs/PrimaryButton";
@@ -30,7 +29,6 @@ interface ChildProps {
 }
 
 const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
-  const router = useRouter();
   const setUser = useAuthStore((state) => state.setUser);
   const [hidePassword, setHidePassword] = useState<boolean>(true);
 

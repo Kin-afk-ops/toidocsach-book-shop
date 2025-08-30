@@ -10,21 +10,13 @@ import Image from "next/image";
 const slides = [
   {
     id: 1,
-    image:
-      "https://cdn1.fahasa.com/media/magentothem/banner7/Resize_CTT_T8_840x320_fix.png",
+    image: "/slide_1.jpg",
     title: "Slide 1",
   },
   {
     id: 2,
-    image:
-      "https://cdn1.fahasa.com/media/magentothem/banner7/Bitex_KC_Resize_840x320_1.png",
+    image: "/slide_2.jpg",
     title: "Slide 2",
-  },
-  {
-    id: 3,
-    image:
-      "https://cdn1.fahasa.com/media/magentothem/banner7/TrangUuDaiT8_840x320_1.png",
-    title: "Slide 3",
   },
 ];
 const Slider = () => {

@@ -27,29 +27,33 @@ const AboutPage = () => {
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, -100]); // hero trượt nhẹ
 
   return (
-    <div className="">
+    <div className="mt-6">
       {/* Hero Section */}
       <motion.section
-        className="relative bg-[url('/hero-bg.jpg')] bg-cover bg-center flex items-center justify-center"
+        className="relative w-full flex items-center justify-center"
         style={{ y: heroY }}
       >
-        <div className="bg-black/50 w-full h-full absolute top-0 left-0"></div>
-        <motion.h1
-          className="relative text-white text-4xl sm:text-6xl font-bold text-center px-4"
-          initial={{ y: -50, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          Giới thiệu về <span className="text-primary">Toidocsach</span>
-        </motion.h1>
+        <div className="relative w-full max-w-[1200px] aspect-[12/5] rounded-[10px] overflow-hidden">
+          <Image
+            src="/hero-bg.png"
+            alt="hero-bg"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
       </motion.section>
-
-      {/* Highlights Section */}
-      <section className="max-w-[1230px]  mx-auto px-5 py-12 ">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">
+      <section className="max-w-[1230px] mx-auto px-5 py-12">
+        <motion.h2
+          className="text-2xl sm:text-3xl font-bold text-center mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           Điểm nổi bật của chúng tôi
-        </h2>
+        </motion.h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {highlightItems.map((item, idx) => (
             <motion.div
@@ -59,7 +63,6 @@ const AboutPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: idx * 0.2 }}
-              style={{ y: heroY }}
             >
               <Image src={item.img} alt={item.title} width={80} height={80} />
               <h3 className="text-xl font-bold mt-4">{item.title}</h3>
@@ -68,7 +71,6 @@ const AboutPage = () => {
           ))}
         </div>
       </section>
-
       {/* Connection Methods */}
       <section className="bg-gray-50 py-12 px-5  ">
         <div className="max-w-[1230px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-center">

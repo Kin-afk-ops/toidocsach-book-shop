@@ -2,14 +2,8 @@
 import CartTable from "@/components/cart/CartTable";
 import PrimaryButton from "@/components/customs/PrimaryButton";
 import LoadingScreen from "@/components/loading/LoadingScreen";
-import {
-  CartInterface,
-  CartItemInterface,
-  CartItemWithCheck,
-} from "@/interface/cart.i";
-import axiosInstance from "@/lib/api/axiosInstance";
+import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
 import { useCartStore } from "@/store/useCartStore";
-import { useAuthStore } from "@/store/useUserStore";
 import { formatPrice } from "@/util/formatPrice ";
 import { showWarning } from "@/util/styles/toast-utils";
 import Image from "next/image";

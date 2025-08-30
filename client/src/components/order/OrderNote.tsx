@@ -10,8 +10,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea";
 
 const OrderNote = () => {

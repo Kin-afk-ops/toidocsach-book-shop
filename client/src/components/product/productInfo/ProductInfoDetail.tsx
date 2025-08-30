@@ -1,12 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { BookDetailInterface } from "@/interface/book.i";
 
 interface ChildProps {
@@ -17,7 +9,7 @@ interface ChildProps {
 const ProductInfoDetail: React.FC<ChildProps> = ({ bookDetail, bookId }) => {
   return (
     <div className="mt-4 list-container p-4">
-      <h2 className="text-lg sm:text-xl font-bold mb-3">Chi tiết</h2>
+      <h2 className="text-lg sm:text-xl font-bold mb-3">Thông tin chi tiết</h2>
       <div>
         <div className="hidden sm:block overflow-x-auto">
           <Table>

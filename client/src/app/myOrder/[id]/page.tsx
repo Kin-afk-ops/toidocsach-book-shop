@@ -34,27 +34,54 @@ import { useEffect, useState } from "react";
 const MyOrderPage = () => {
   const params = useParams<{ id: string }>();
   const userId = params.id;
-  const [orders, setOrders] = useState<OrderInterface[] | null>(null);
+  const [orders, setOrders] = useState<OrderInterface[]>([]);
   const [cancelMode, setCancelMode] = useState<boolean>(false);
   const [cancelOrder, setCancelOrder] = useState<OrderInterface | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [fetchingMore, setFetchingMore] = useState<boolean>(false);
+
+  const fetchOrders = async (page: number) => {
+    try {
+      if (page > totalPage) return;
+
+      const res = await axiosInstance.get(`/order/${userId}?page=${page}`);
+      const { orders: newOrders, current_page, total_page } = res.data;
+
+      setOrders((prev) => [...prev, ...newOrders]);
+      setCurrentPage(current_page);
+      setTotalPage(total_page);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setFetchingMore(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async (): Promise<void> => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        if (userId) {
-          const res = await axiosInstance.get(`/order/${userId}`);
-          setOrders(res.data);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+    fetchOrders(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (fetchingMore || currentPage >= totalPage) return;
+
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 300; // khi cách bottom 300px
+
+      if (scrollPosition >= threshold) {
+        setFetchingMore(true);
+        fetchOrders(currentPage + 1);
       }
     };
-    fetchOrders();
-  }, [userId]);
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, totalPage, fetchingMore]);
 
   const formatAddress = (order: OrderInterface): string => {
     if (order.country === "Việt Nam") {
@@ -349,6 +376,10 @@ const MyOrderPage = () => {
             ))}
         </div>
       </div>
+
+      {fetchingMore && (
+        <div className="text-center py-4 text-gray-500">Đang tải thêm...</div>
+      )}
 
       <AlertDialog open={cancelMode} onOpenChange={setCancelMode}>
         <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-lg">

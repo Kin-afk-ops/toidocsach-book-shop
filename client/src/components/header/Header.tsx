@@ -1,20 +1,11 @@
 "use client";
-import {
-  Bell,
-  BookA,
-  ChartBarBig,
-  NotebookPen,
-  Search,
-  ShoppingCart,
-  User,
-} from "lucide-react";
+import { BookA, ShoppingCart, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useEffect, useState } from "react";
@@ -24,9 +15,8 @@ import {
   HoverCardTrigger,
 } from "../ui/hover-card";
 import PrimaryButton from "../customs/PrimaryButton";
-import TransparentButton from "../customs/TransparentButton";
 
-import { Dialog, DialogTrigger } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 import AuthBlock from "../auth/AuthBlock";
 import { Badge } from "../ui/badge";
 import { useRouter } from "next/navigation";
@@ -57,29 +47,29 @@ const Header = () => {
   const closeModal = useAuthStore((state) => state.closeModal);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [language, setLanguage] = useState<{
-    label: string;
-    value: string;
-    logo: string;
-  }>({
-    label: "English",
-    value: "Eng",
-    logo: "/us_uk_logo.jpg",
-  });
+  // const [language, setLanguage] = useState<{
+  //   label: string;
+  //   value: string;
+  //   logo: string;
+  // }>({
+  //   label: "English",
+  //   value: "Eng",
+  //   logo: "/us_uk_logo.jpg",
+  // });
 
-  const languages = [
-    {
-      label: "Tiếng Việt",
-      value: "Vi",
-      logo: "/vn_logo.jpg",
-    },
+  // const languages = [
+  //   {
+  //     label: "Tiếng Việt",
+  //     value: "Vi",
+  //     logo: "/vn_logo.jpg",
+  //   },
 
-    {
-      label: "English",
-      value: "Eng",
-      logo: "/us_uk_logo.jpg",
-    },
-  ];
+  //   {
+  //     label: "English",
+  //     value: "Eng",
+  //     logo: "/us_uk_logo.jpg",
+  //   },
+  // ];
 
   const [hoverOpen, setHoverOpen] = useState(false);
 

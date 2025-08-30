@@ -55,7 +55,12 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
             }`}
             key={index}
           >
-            <Image alt={"Ảnh sản phẩm"} src={image.image_url} fill />
+            <Image
+              alt={"Ảnh sản phẩm"}
+              src={image.image_url}
+              fill
+              className="object-contain"
+            />
 
             {remaining > 0 && (
               <>

@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import SignInBlock from "./SignInBlock";
 import SignUpBlock from "./SignUpBlock";
@@ -18,7 +13,7 @@ interface ChildProps {
   setDialogOpenSignIn?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AuthBlock: React.FC<ChildProps> = ({ mode, setDialogOpenSignIn }) => {
+const AuthBlock: React.FC<ChildProps> = ({ mode }) => {
   const [signInMode, setSignInMode] = useState<boolean>(mode);
   const [loading, setLoading] = useState<boolean>(false);
 
