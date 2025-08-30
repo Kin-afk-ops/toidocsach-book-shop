@@ -8,7 +8,7 @@ interface ChildProps {
 }
 const CategoriesDetail: React.FC<ChildProps> = ({ categories }) => {
   return (
-    <div className={`pt-[15px] gap-2 grid grid-cols-${categories?.length}`}>
+    <div className="pt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
       {categories.length !== 0 &&
         categories.map((category) => (
           <Link

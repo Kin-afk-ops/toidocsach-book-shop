@@ -38,8 +38,10 @@ const ProductInfo: React.FC<ChildProps> = ({
 
   return (
     <div className="list-container p-4 ">
-      <h1 className="text-2xl font-bold">{title && title}</h1>
-      <div className="grid grid-cols-2 mt-4 text-[var(--text) text-sm">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-snug">
+        {title && title}
+      </h1>
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[var(--text)] text-sm sm:text-base">
         <div>
           <div>
             Nhà cung cấp:{" "}
@@ -59,7 +61,7 @@ const ProductInfo: React.FC<ChildProps> = ({
           </div>
         </div>
       </div>
-      <div className="text-[var(--text) grid grid-cols-2 my-4">
+      <div className="my-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[var(--text)] text-sm sm:text-base">
         <div>
           Đã bán:
           <span className="font-bold">
@@ -76,26 +78,26 @@ const ProductInfo: React.FC<ChildProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center ">
-        <p className="font-bold text-[32px] leading-[32px] text-[var(--primary)]">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="font-bold text-2xl sm:text-[32px] leading-tight text-[var(--primary)]">
           {price && discount
             ? formatPrice(price - (price * discount) / 100)
             : "0"}
         </p>
-        <p className="ml-2 text-[var(--text)] line-through">
+        <p className="text-[var(--text)] line-through text-sm sm:text-base">
           {price && formatPrice(price)}{" "}
         </p>
         <Badge
           variant="destructive"
-          className="px-[4px] py-[3px] ml-2 bg-[var(--primary)] "
+          className="px-2 py-1 bg-[var(--primary)] text-white text-xs sm:text-sm"
         >
           -{discount && discount}%
         </Badge>
       </div>
 
-      <div className="text-[18px] font-bold mt-6 flex items-center">
-        Số lượng:
-        <div className="flex items-center ml-4 border border-[#ccc] rounded-[5px]">
+      <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+        <span className="text-base sm:text-lg font-bold">Số lượng:</span>
+        <div className="flex items-center border border-[#ccc] rounded-md w-max">
           <button
             className="p-2 cursor-pointer"
             onClick={() => {
@@ -113,7 +115,7 @@ const ProductInfo: React.FC<ChildProps> = ({
             />
           </button>
           <input
-            className="w-[50px] text-center outline-0"
+            className="w-12 text-center outline-0 text-sm sm:text-base"
             type="text"
             value={quantity.toString()} // ép sang string
             onChange={(e) => {

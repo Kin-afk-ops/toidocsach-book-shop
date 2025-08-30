@@ -23,9 +23,9 @@ const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
       href={`/product/${formatSlug(bookItem.title)}.html?q=${bookItem.id}`}
       key={bookItem.id}
     >
-      <Card className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+      <Card className="hover:shadow-lg transition-shadow duration-300 cursor-pointer flex flex-col h-full">
         <CardHeader className="p-0">
-          <div className="relative w-full h-[150px]">
+          <div className="relative w-full h-[180px] sm:h-[200px] md:h-[220px]">
             {bookItem?.images && (
               <Image
                 src={bookItem.images[0].image_url}
@@ -36,31 +36,34 @@ const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
             )}
           </div>
         </CardHeader>
-        <CardContent className="p-2">
-          <CardTitle className="text-[14px] font-medium line-clamp-2 h-[40px]">
+        <CardContent className="p-2 sm:p-3 flex-1 flex flex-col">
+          <CardTitle className="text-xs sm:text-sm md:text-base font-medium line-clamp-2 min-h-[36px] sm:min-h-[40px]">
             {bookItem.title}
           </CardTitle>
           <div className="mt-2">
-            <span className="font-bold font-semibold text-[var(--primary)] text-xl">
+            <span className="font-bold text-[var(--primary)] text-base sm:text-lg md:text-xl">
               {bookItem.price && bookItem.discount
                 ? formatPrice(
                     bookItem.price - (bookItem.price * bookItem.discount) / 100
                   )
                 : "0"}
             </span>
-            <Badge variant="destructive" className="px-[4px] py-[3px] ml-2">
+            <Badge
+              variant="destructive"
+              className="px-1.5 py-0.5 ml-2 text-[10px] sm:text-xs"
+            >
               -{bookItem.discount}%
             </Badge>
           </div>
 
-          <div className="mt-2">
-            <span className=" font-semibold text-[var(--text)] text-sm  line-through">
+          <div className="mt-1">
+            <span className="text-gray-500 text-xs sm:text-sm line-through">
               {formatPrice(bookItem.price)}
             </span>
           </div>
         </CardContent>
         <CardFooter className="p-2">
-          <div className="w-full bg-gray-200 rounded-full h-4 relative">
+          <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 relative">
             <div
               className="bg-[var(--primary)] h-4 rounded-full"
               style={{
@@ -71,7 +74,7 @@ const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
               }}
             ></div>
 
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 text-xs font-bold text-white">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-bold text-white">
               Sold {bookItem.sold_count}
             </div>
           </div>

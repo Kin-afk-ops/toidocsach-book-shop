@@ -39,9 +39,9 @@ const ProductPage = async ({ searchParams }: ProductPageProps) => {
   }
 
   return (
-    <div className="max-w-[1230px] grid grid-cols-[40%_60%] gap-6 mx-auto px-4 py-6">
+    <div className="max-w-[1230px] mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[40%_60%] gap-6">
       <div className="relative">
-        <div className="sticky top-6">
+        <div className="lg:sticky lg:top-6">
           <ProductAction
             images={bookData.images}
             bookId={bookId}

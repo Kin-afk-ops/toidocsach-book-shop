@@ -42,7 +42,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
-import { BookInterface } from "@/interface/book.i";
+import { BookInterface, BookItemInterface } from "@/interface/book.i";
 import { useCartStore } from "@/store/useCartStore";
 import Link from "next/link";
 import formatSlug from "@/util/formatSlug";
@@ -103,6 +103,36 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const updateQuantity = async (
+    newQuantity: number,
+    item: CartItemWithCheck
+  ) => {
+    setData((prev) =>
+      prev.map((p) => (p.id === item.id ? { ...p, quantity: newQuantity } : p))
+    );
+
+    setCartItems(
+      cartItems.map((p) =>
+        p.id === item.id ? { ...p, quantity: newQuantity } : p
+      )
+    );
+
+    if (user) {
+      setLoading(true);
+      try {
+        await axiosInstance.put(`/cart/${user?.id}/update`, {
+          book_id: item.book?.id,
+          quantity: newQuantity,
+        });
+      } catch (error) {
+        console.error("Lỗi cập nhật số lượng:", error);
+        showError("Cập nhật số lượng thất bại");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const columns: ColumnDef<CartItemWithCheck>[] = [
@@ -195,42 +225,13 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
         const item = row.original;
         const bookQuantity = item.book?.quantity ? item.book?.quantity : 0;
 
-        const updateQuantity = async (newQuantity: number) => {
-          setData((prev) =>
-            prev.map((p) =>
-              p.id === item.id ? { ...p, quantity: newQuantity } : p
-            )
-          );
-
-          setCartItems(
-            cartItems.map((p) =>
-              p.id === item.id ? { ...p, quantity: newQuantity } : p
-            )
-          );
-
-          if (user) {
-            setLoading(true);
-            try {
-              await axiosInstance.put(`/cart/${user?.id}/update`, {
-                book_id: item.book?.id,
-                quantity: newQuantity,
-              });
-            } catch (error) {
-              console.error("Lỗi cập nhật số lượng:", error);
-              showError("Cập nhật số lượng thất bại");
-            } finally {
-              setLoading(false);
-            }
-          }
-        };
-
         return (
           <div className="flex items-center justify-center border border-[#ccc] rounded-[5px]">
             <button
               className="p-1 cursor-pointer"
               onClick={() => {
                 if (item.quantity > 1) {
-                  updateQuantity(item.quantity - 1);
+                  updateQuantity(item.quantity - 1, item);
                 }
               }}
             >
@@ -256,7 +257,7 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
               className="p-1 cursor-pointer"
               onClick={() => {
                 if (item.quantity < bookQuantity) {
-                  updateQuantity(item.quantity + 1);
+                  updateQuantity(item.quantity + 1, item);
                 }
               }}
             >
@@ -334,49 +335,148 @@ const CartTable: React.FC<ChildProps> = ({ data, setData, setLoading }) => {
 
   return (
     <div className="list-container">
-      <Table>
-        <TableHeader className="mb-2">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="cursor-pointer "
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div className="hidden lg:block">
+        <Table>
+          <TableHeader className="mb-2">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                😔 Không có sản phẩm nào trong giỏ hàng
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer "
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  😔 Không có sản phẩm nào trong giỏ hàng
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile view */}
+      <div className="space-y-4 lg:hidden">
+        {cartItems.map((item) => (
+          <div
+            key={item.id}
+            className="flex gap-4 p-4 border rounded-lg items-center"
+          >
+            <Checkbox
+              checked={item.checked}
+              onCheckedChange={() => toggleItemCheck(item.book?.id || "")}
+              aria-label="Chọn sản phẩm"
+              className="mt-2 cursor-pointer"
+            />
+            <Image
+              src={item.book?.images ? item.book.images[0].image_url : ""}
+              alt={item.book?.title || "Sách"}
+              width={80}
+              height={80}
+              className="object-contain w-[80px] h-[80px]"
+            />
+
+            <div className="flex flex-col justify-between flex-1">
+              {/* Tên sách */}
+              <Link
+                href={`/product/${formatSlug(item.book?.title || "")}.html?q=${
+                  item.book?.id
+                }`}
+                className="text-sm font-medium line-clamp-2 hover:underline"
+              >
+                {item.book?.title}
+              </Link>
+
+              {/* Giá */}
+              <div className="flex items-center gap-2">
+                <p className="text-red-600 font-bold">
+                  {item.book?.price && item.book?.discount
+                    ? formatPrice(
+                        item.book.price -
+                          (item.book.price * item.book.discount) / 100
+                      )
+                    : "0"}
+                </p>
+                <p className="text-gray-400 line-through text-sm">
+                  {formatPrice(item.book?.price ?? 0)}
+                </p>
+              </div>
+
+              {/* Số lượng + Xóa */}
+              <div className="flex items-center justify-between mt-2">
+                {/* Quantity control */}
+                <div className="flex items-center border rounded">
+                  <button
+                    className="px-2 py-1"
+                    onClick={() => {
+                      if (item.quantity > 1) {
+                        updateQuantity(item.quantity - 1, item);
+                      }
+                    }}
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <span className="px-3">{item.quantity}</span>
+                  <button
+                    className="px-2 py-1"
+                    onClick={() => {
+                      if (
+                        item.book?.quantity &&
+                        item.quantity < item.book.quantity
+                      ) {
+                        updateQuantity(item.quantity + 1, item);
+                      }
+                    }}
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                {/* Delete button */}
+                <Trash2
+                  className="text-gray-600 hover:text-red-500 cursor-pointer"
+                  onClick={() => {
+                    setBookDelete(item.book || null);
+                    setDeleteMode(true);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <AlertDialog open={deleteMode} onOpenChange={setDeleteMode}>
         <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-lg">

@@ -16,9 +16,9 @@ const CategoriesFilterDetail: React.FC<ChildProps> = ({ categories }) => {
       <li className="group">
         <Link
           href={`/categories/new-book.html?page=${1}`}
-          className={`cursor-pointer transition duration-100 group-hover:text-[var(--primary)] ${
-            !currentCateId && "text-[var(--primary)]"
-          }`}
+          className={`block cursor-pointer transition duration-100 group-hover:text-[var(--primary)] 
+            text-sm md:text-base py-2
+            ${!currentCateId ? "text-[var(--primary)]" : ""}`}
         >
           Sách mới
         </Link>
@@ -30,16 +30,18 @@ const CategoriesFilterDetail: React.FC<ChildProps> = ({ categories }) => {
               href={`/categories/${formatSlug(
                 category?.title
               )}.html?page=${1}&q=${category?.id}`}
-              className={`cursor-pointer transition duration-100 group-hover:text-[var(--primary)] ${
-                currentCateId === category.id && "text-[var(--primary)]"
-              }`}
+              className={`block cursor-pointer transition duration-100 group-hover:text-[var(--primary)] 
+                text-sm md:text-base py-2
+                ${
+                  currentCateId === category.id ? "text-[var(--primary)]" : ""
+                }`}
             >
               {category.title}
             </Link>
           </li>
         ))
       ) : (
-        <div className="text-center text-red-500 font-medium py-4">
+        <div className="text-center text-red-500 font-medium py-4 text-sm md:text-base">
           The system is experiencing an error. Sometimes errors may occur,
           please kindly understand.
         </div>

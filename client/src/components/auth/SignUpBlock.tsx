@@ -121,7 +121,7 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
   };
 
   return (
-    <div className="flex w-full justify-center mt-2">
+    <div className="flex w-full justify-center  mt-2">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

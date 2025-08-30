@@ -24,17 +24,17 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
     console.log("lightGallery has been initialized");
   };
   return (
-    <div className="flex flex-col gap-4  w-[400px]  items-center">
+    <div className="flex flex-col gap-4 w-full max-w-[400px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[400px] items-center">
       {/* Hình chính */}
 
       <LightGallery
         onInit={onInit}
         speed={500}
         plugins={[lgThumbnail, lgZoom]}
-        elementClassNames="flex gap-2  justify-start flex-wrap  w-full "
+        elementClassNames="flex gap-2 justify-start flex-wrap w-full"
       >
         <a
-          className="relative w-full h-[376px] cursor-pointer"
+          className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] lg:h-[376px] cursor-pointer"
           href={images[0].image_url}
           data-src={images[0].image_url}
         >
@@ -50,7 +50,7 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
           <a
             href={image.image_url}
             data-src={image.image_url}
-            className={` relative h-[70px] w-[70px] cursor-pointer flex justify-center mt-4 ${
+            className={`relative h-[60px] w-[60px] sm:h-[70px] sm:w-[70px] cursor-pointer flex justify-center mt-3 sm:mt-4 ${
               index < 5 ? "block" : "hidden"
             }`}
             key={index}
@@ -60,8 +60,8 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
             {remaining > 0 && (
               <>
                 {index === 4 && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center ">
-                    <span className="text-white font-semibold text-lg">
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded">
+                    <span className="text-white font-semibold text-base sm:text-lg">
                       +{remaining}
                     </span>
                   </div>

@@ -70,14 +70,15 @@ const ListPage = () => {
   return (
     <>
       {loading && <LoadingScreen />}
-      <div className="list-container">
+      <div className="list-container sm:px-6 lg:px-0">
         {/* Nếu không có sách */}
         {bookResult?.books?.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
+          <div className="text-center py-10 text-gray-500 text-sm sm:text-base">
             Không có sản phẩm nào để hiển thị
           </div>
         ) : (
           <>
+            {" "}
             <ListCart bookItems={bookResult.books} />
             <ListPagination
               totalPage={bookResult.total_pages}

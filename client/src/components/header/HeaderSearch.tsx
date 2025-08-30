@@ -56,10 +56,16 @@ const HeaderSearch = () => {
   };
 
   return (
-    <div className="w-[calc(100%_-_700px)] flex border border-[#ccc] rounded-[10px] items-center relative">
+    <div
+      className="
+    flex items-center border border-[#ccc] rounded-[10px] relative
+    w-full md:flex-1 md:max-w-[600px]
+    bg-white
+  "
+    >
       <input
         placeholder="book"
-        className="h-[40px] w-[85%] outline-0 border-0 pl-4"
+        className="h-10 flex-1 outline-0 border-0 pl-4 text-sm sm:text-base"
         value={searchValue}
         onChange={(e) => {
           const val = e.target.value;
@@ -82,10 +88,10 @@ const HeaderSearch = () => {
       />
       <Button
         variant="default"
-        className="bg-[#e11d48] hover:bg-[#be123c] cursor-pointer w-[15%]"
+        className="bg-[#e11d48] hover:bg-[#be123c] cursor-pointer h-10 px-4 sm:px-6"
         onClick={() => handleSearch(searchValue)}
       >
-        <Search />
+        <Search size={18} />
       </Button>
 
       {/* History Dropdown */}
@@ -110,7 +116,7 @@ const HeaderSearch = () => {
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2 text-xs sm:text-sm">
             {histories.map((item, index) => (
               <Badge
                 key={index}
@@ -144,7 +150,7 @@ const HeaderSearch = () => {
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2 text-xs sm:text-sm">
             {suggestList.map((suggest, index) => (
               <Badge
                 key={index}

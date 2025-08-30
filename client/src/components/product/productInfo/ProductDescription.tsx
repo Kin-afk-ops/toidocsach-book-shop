@@ -8,15 +8,15 @@ interface ChildProps {
 const ProductDescription: React.FC<ChildProps> = ({ description }) => {
   const [fullDescMode, setFullDescMode] = useState<boolean>(false);
   return (
-    <div className="mt-4 list-container p-4">
-      <h2 className="text-[18px] font-bold">Description</h2>
+    <div className="mt-4 list-container p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-bold">Description</h2>
 
       <div
-        className={`relative text-[14px] text-justify leading-[25px] text-[var(--text)] mt-4 transition-all duration-300`}
+        className={`relative text-[14px] sm:text-[15px] text-justify leading-[25px] sm:leading-[28px] text-[var(--text)] mt-4 transition-all duration-300`}
       >
         <div
           className={`overflow-hidden transition-all duration-300 ${
-            fullDescMode ? "max-h-none" : "max-h-[250px]"
+            fullDescMode ? "max-h-none" : "max-h-[200px] sm:max-h-[250px]"
           }`}
         >
           {description && (
@@ -25,7 +25,7 @@ const ProductDescription: React.FC<ChildProps> = ({ description }) => {
         </div>
         {!fullDescMode && (
           <div
-            className="text-center h-[250px] w-full absolute bottom-0"
+            className="absolute bottom-0 w-full h-[200px] sm:h-[250px]"
             style={{
               background:
                 "linear-gradient(180deg, hsla(0, 0%, 100%, 0), #fff 80%)",
@@ -34,7 +34,7 @@ const ProductDescription: React.FC<ChildProps> = ({ description }) => {
         )}
       </div>
 
-      <div className="w-full flex justify-center">
+      <div className="w-full flex justify-center mt-2">
         <Button
           onClick={() => setFullDescMode((prev) => !prev)}
           variant="secondary"

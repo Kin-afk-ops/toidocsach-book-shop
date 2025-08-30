@@ -11,4 +11,9 @@ module.exports = {
     },
   },
   plugins: [lineClamp],
+  corePlugins: {
+    // Tailwind >=3.2 đã có hỗ trợ scroll snap
+    scrollSnapType: true,
+    scrollSnapAlign: true,
+  },
 };

@@ -177,7 +177,13 @@ const OrderPage = () => {
       {loading && <LoadingScreen />}
       <Form {...form}>
         <form
-          className="max-w-[1230px] grid grid-cols-[40%_60%] gap-6 mx-auto px-4 py-6 flex"
+          className="
+    max-w-[1230px] 
+    mx-auto px-4 py-6 
+    grid gap-6 
+    grid-cols-1 
+    lg:grid-cols-[40%_60%]
+  "
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <div>
@@ -194,8 +200,8 @@ const OrderPage = () => {
                     name="fullname"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <div className="flex items-center">
-                          <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                        <div className="flex flex-col lg:flex-row lg:items-center">
+                          <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                             Họ tên người nhận
                           </FormLabel>
                           <FormControl>
@@ -217,8 +223,8 @@ const OrderPage = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <div className="flex items-center">
-                          <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                        <div className="flex flex-col lg:flex-row lg:items-center">
+                          <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                             Số điện thoại
                           </FormLabel>
                           <FormControl>
@@ -239,8 +245,8 @@ const OrderPage = () => {
                     name="country"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <div className="flex items-center">
-                          <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                        <div className="flex flex-col lg:flex-row lg:items-center">
+                          <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                             Quốc gia
                           </FormLabel>
                           <FormControl>
@@ -289,8 +295,8 @@ const OrderPage = () => {
                         <>
                           {provinces.length > 0 && (
                             <FormItem className="w-full">
-                              <div className="flex items-center">
-                                <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                              <div className="flex flex-col lg:flex-row lg:items-center">
+                                <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                                   Tỉnh/Thành phố
                                 </FormLabel>
                                 <FormControl>
@@ -345,8 +351,8 @@ const OrderPage = () => {
                         <>
                           {wards.length > 0 && (
                             <FormItem className="w-full">
-                              <div className="flex items-center">
-                                <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                              <div className="flex flex-col lg:flex-row lg:items-center">
+                                <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                                   Phường/Xã
                                 </FormLabel>
                                 <FormControl>
@@ -383,8 +389,8 @@ const OrderPage = () => {
                     name="address"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <div className="flex items-center">
-                          <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                        <div className="flex flex-col lg:flex-row lg:items-center">
+                          <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                             Địa chỉ cụ thể
                           </FormLabel>
                           <FormControl>
@@ -463,8 +469,8 @@ const OrderPage = () => {
                     control={form.control}
                     name="note"
                     render={({ field }) => (
-                      <FormItem className="flex items-center">
-                        <FormLabel className="text-[var(--text)] mr-2 w-[30%]">
+                      <FormItem className="flex flex-col lg:flex-row lg:items-center">
+                        <FormLabel className="text-[var(--text)] mb-2 lg:mb-0 lg:mr-2 lg:w-[30%]">
                           Ghi chú
                         </FormLabel>
                         <FormControl>
@@ -488,12 +494,12 @@ const OrderPage = () => {
           <div className="relative">
             <div className="sticky top-6">
               <div className="flex w-full justify-center my-4">
-                <div className="w-full bg-white p-4">
+                <div className="w-full bg-white p-4 rounded-lg shadow">
                   <div className="py-4 text-[16px] font-bold uppercase w-full border-b border-[#ccc]">
                     Kiểm tra đơn hàng
                   </div>
 
-                  <div>
+                  <div className="hidden md:block">
                     <Table>
                       <TableBody>
                         {cartChecks.length > 0 ? (
@@ -562,20 +568,77 @@ const OrderPage = () => {
                         )}
                       </TableBody>
                     </Table>
+                  </div>
 
-                    <div className="flex justify-between mt-4">
-                      <div className="flex items-center">
-                        <span className="text-[18px] ">Tổng đơn hàng: </span>
-                        <span className="ml-2 text-[20px] font-bold text-[var(--primary)]">
-                          {formatPrice(handleGrandTotal())}
-                        </span>
-                      </div>
-                      <div className="w-[50%]">
-                        <PrimaryButton
-                          content="Xác nhận đơn hàng"
-                          type="submit"
+                  <div className="space-y-4 md:hidden mt-4">
+                    {cartChecks.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex gap-4 p-4 border rounded-lg shadow-sm"
+                      >
+                        <Image
+                          src={item.book ? item.book.images[0].image_url : ""}
+                          alt={item.book ? item.book.title : "Sách"}
+                          width={80}
+                          height={80}
+                          className="object-contain w-[80px] h-[80px]"
                         />
+
+                        <div className="flex flex-col justify-between flex-1 text-sm">
+                          {/* Tên sách */}
+                          <p className="font-medium line-clamp-2 text-[14px]">
+                            {item.book?.title}
+                          </p>
+
+                          {/* Giá */}
+                          <div className="flex items-center gap-2">
+                            <p className="text-red-600 font-bold">
+                              {item.book
+                                ? formatPrice(
+                                    item.book.price -
+                                      (item.book.price * item.book.discount) /
+                                        100
+                                  )
+                                : "0"}
+                            </p>
+                            <p className="text-gray-400 line-through text-xs">
+                              {formatPrice(item.book?.price ?? 0)}
+                            </p>
+                          </div>
+
+                          {/* SL + Tổng */}
+                          <div className="flex justify-between items-center mt-1">
+                            <span>Số lượng: {item.quantity}</span>
+                            <span className="font-bold text-[var(--primary)]">
+                              {item.book
+                                ? formatPrice(
+                                    (item.book.price -
+                                      (item.book.price * item.book.discount) /
+                                        100) *
+                                      item.quantity
+                                  )
+                                : "0"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+                    <div className="flex items-center">
+                      <span className="text-[16px] md:text-[18px]">
+                        Tổng đơn hàng:{" "}
+                      </span>
+                      <span className="ml-2 text-[18px] md:text-[20px] font-bold text-[var(--primary)]">
+                        {formatPrice(handleGrandTotal())}
+                      </span>
+                    </div>
+                    <div className="w-full md:w-[50%]">
+                      <PrimaryButton
+                        content="Xác nhận đơn hàng"
+                        type="submit"
+                      />
                     </div>
                   </div>
                 </div>

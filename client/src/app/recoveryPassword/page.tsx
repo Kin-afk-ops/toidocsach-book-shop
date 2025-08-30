@@ -101,23 +101,25 @@ const RecoveryPasswordPage = () => {
   return (
     <div className="max-w-[1230px] mx-auto px-4 py-6 flex justify-center">
       {loading && <LoadingScreen />}
-      <div className="w-[40%] bg-white flex flex-col items-center rounded">
-        <h1 className="uppercase py-4 font-bold text-[18px]">
+      <div className="w-full sm:w-3/4 md:w-[50%] lg:w-[40%] bg-white flex flex-col items-center rounded shadow-sm">
+        <h1 className="uppercase py-4 font-bold text-lg sm:text-xl text-center">
           Khôi phục mật khẩu
         </h1>
 
-        <div className="flex flex-col w-full justify-center mt-2 p-4">
+        <div className="flex flex-col w-full justify-center mt-2 p-4 sm:p-6 space-y-6">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8 w-full min-w-[300px]"
+              className="space-y-4 w-full"
             >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">Email</FormLabel>
+                    <FormLabel className="mb-1 text-base sm:text-lg">
+                      Email
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Nhập email"
@@ -141,7 +143,9 @@ const RecoveryPasswordPage = () => {
                 name="otpCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">Mã OTP</FormLabel>
+                    <FormLabel className="mb-1 text-base sm:text-lg">
+                      Mã OTP
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="6 ký tự"
@@ -160,7 +164,7 @@ const RecoveryPasswordPage = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="mb-2 text-[lg]">
+                    <FormLabel className="mb-1 text-base sm:text-lg">
                       Mật khẩu mới
                     </FormLabel>
                     <FormControl>

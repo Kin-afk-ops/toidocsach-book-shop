@@ -9,9 +9,9 @@ const Footer = () => {
   return (
     <footer className="bg-white py-12 px-5">
       <div className="max-w-[1230px] mx-auto">
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Bên trái */}
-          <div className="col-span-12 lg:col-span-3 relative pr-6 border-r border-gray-300">
+          <div className="col-span-12 lg:col-span-3 relative pr-0 lg:pr-6 lg:border-r border-gray-300">
             <Link href="/">
               <Image
                 src={"/logo.png"}
@@ -33,9 +33,9 @@ const Footer = () => {
 
           {/* Bên phải */}
           <div className="col-span-12 lg:col-span-9 lg:pl-12">
-            <div className="grid grid-cols-12 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* Dịch vụ */}
-              <div className="col-span-12 md:col-span-4">
+              <div>
                 <p className="text-xl font-bold mb-4">DỊCH VỤ</p>
                 <ul className="space-y-2">
                   <li>
@@ -49,53 +49,24 @@ const Footer = () => {
                 </ul>
               </div>
 
-              {/* Hỗ trợ */}
-              <div className="col-span-12 md:col-span-4">
+              {/* Chính sách */}
+              <div>
                 <p className="text-xl font-bold mb-4">CHÍNH SÁCH</p>
                 <ul className="space-y-2">
-                  <li>
-                    <div
-                      // href="/nationwide-shipping"
-                      className="hover:text-primary transition-colors"
-                    >
-                      Giao hàng toàn quốc
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      // href="/7-day-return"
-                      className="hover:text-primary transition-colors"
-                    >
-                      Đổi trả trong 7 ngày
-                    </div>
-                  </li>
-                  <li>
-                    <div
-                      // href="/100-percent-refund"
-                      className="hover:text-primary transition-colors"
-                    >
-                      Hoàn tiền 100%
-                    </div>
-                  </li>
-                  {/* <li>
-                    <Link
-                      href="/payment-methods"
-                      className="hover:text-primary transition-colors"
-                    >
-                      Thanh toán: Tiền mặt, VNPAY & MOMO
-                    </Link>
-                  </li> */}
+                  <li>Giao hàng toàn quốc</li>
+                  <li>Đổi trả trong 7 ngày</li>
+                  <li>Hoàn tiền 100%</li>
                 </ul>
               </div>
 
-              {/* Tài khoản */}
+              {/* Tài khoản (nếu muốn thêm) */}
               {/* <FooterAccount /> */}
             </div>
 
             {/* Liên hệ */}
             <div>
               <p className="text-xl font-bold mb-4">LIÊN HỆ</p>
-              <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                 <li className="flex items-center space-x-2">
                   <MapPin />
                   <a
@@ -112,9 +83,7 @@ const Footer = () => {
                 <li className="flex items-center space-x-2">
                   <Mail />
                   <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=linhb2110130@student.ctu.edu.vn"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="mailto:linhb2110130@student.ctu.edu.vn"
                     className="hover:underline hover:text-[var(--primary)] transition-colors"
                   >
                     linhb2110130@student.ctu.edu.vn
@@ -137,7 +106,7 @@ const Footer = () => {
         <hr className="my-6 border-gray-300" />
 
         <div className="text-center text-sm">
-          <span>© Bản quyền thuộc về </span>
+          © Bản quyền thuộc về{" "}
           <span className="font-bold cursor-pointer hover:text-primary">
             Toidocsach
           </span>

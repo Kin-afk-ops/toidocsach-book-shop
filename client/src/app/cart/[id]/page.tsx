@@ -82,8 +82,8 @@ const CartPage = () => {
     <>
       {loading && <LoadingScreen />}
 
-      <div className="max-w-[1230px] grid grid-cols-[70%_30%] gap-6 mx-auto px-4 py-6 flex">
-        <div>
+      <div className="max-w-[1230px] grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 mx-auto px-4 py-6">
+        <div className="col-span-1">
           {cartItemsPage.length !== 0 ? (
             <CartTable
               data={cartItemsPage}
@@ -106,8 +106,8 @@ const CartPage = () => {
           )}
         </div>
 
-        <div className="relative">
-          <div className="sticky top-6">
+        <div className="col-span-1">
+          <div className="lg:sticky lg:top-6">
             <div className="list-container p-4">
               <div className="flex justify-between items-center pb-6">
                 <p className="text-[16px] font-bold">Tổng cộng</p>

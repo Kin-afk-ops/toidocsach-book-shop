@@ -19,16 +19,16 @@ interface ChildProps {
 
 const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
   return (
-    <div className="grid grid-cols-5 gap-4 pt-[15px]">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pt-4">
       {products.length > 0 &&
         products.map((product) => (
           <Link
             href={`/product/${formatSlug(product.title)}.html?q=${product.id}`}
             key={product.id}
           >
-            <Card className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+            <Card className="hover:shadow-lg transition duration-300 cursor-pointer flex flex-col">
               <CardHeader className="p-0">
-                <div className="relative w-full h-[150px]">
+                <div className="relative w-full h-[180px] sm:h-[200px]">
                   <Image
                     src={
                       product.images?.[0]?.image_url ||
@@ -41,13 +41,13 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-2">
-                <CardTitle className="text-[14px] font-medium line-clamp-2 h-[40px]">
+              <CardContent className="p-3 flex-1 flex flex-col">
+                <CardTitle className="text-sm font-medium line-clamp-2 h-[40px]">
                   {product.title}
                 </CardTitle>
 
                 <div className="mt-2">
-                  <span className="font-bold font-semibold text-[var(--primary)] text-xl">
+                  <span className="font-bold text-[var(--primary)] text-lg">
                     {product.price && product.discount
                       ? formatPrice(
                           product.price -
@@ -58,7 +58,7 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
                   {product.discount ? (
                     <Badge
                       variant="destructive"
-                      className="px-[4px] py-[3px] ml-2"
+                      className="px-1 py-[2px] ml-2 text-xs"
                     >
                       -{product.discount}%
                     </Badge>

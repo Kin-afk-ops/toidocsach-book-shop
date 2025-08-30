@@ -135,19 +135,22 @@ const Header = () => {
       {loading && <LoadingScreen />}
       <header className="w-full bg-white">
         <div className="mx-auto max-w-[1230px] h-[68px] flex items-center justify-between">
-          <Link href={"/"}>
+          <Link href={"/"} className="shrink-0">
             <Image
               src="/logo.png"
               alt="logo"
-              width={220}
+              width={180}
               height={40}
               priority
+              className="w-[120px] sm:w-[160px] md:w-[180px] lg:w-[220px]"
             />
           </Link>
 
-          <HeaderSearch />
+          <div className="hidden md:flex flex-1 px-4">
+            <HeaderSearch />
+          </div>
 
-          <div className="flex justify-end gap-12 w-[340px]">
+          <div className="flex items-center gap-4 sm:gap-6 md:gap-10 text-xs sm:text-sm">
             {/* <HoverCard openDelay={100} closeDelay={100}>
               <HoverCardTrigger>
                 <div className="text-[12px]  cursor-pointer leading-relaxed text-[var(--text)] relative">
@@ -492,7 +495,10 @@ const Header = () => {
                     )}
                   </button>
                 </HoverCardTrigger>
-                <HoverCardContent align="end" className="w-[360px]">
+                <HoverCardContent
+                  align="end"
+                  className="w-[360px] hidden md:block"
+                >
                   <div className="flex text-[16px] justify-between">
                     <div className="text-[#0D0E0F] flex items-center font-bold">
                       <ShoppingCart size={16} className="mr-2 font-bold" />
@@ -677,6 +683,10 @@ const Header = () => {
           </div>
         </div>
       </header>
+
+      <div className="flex md:hidden px-4 pb-2">
+        <HeaderSearch />
+      </div>
 
       <Dialog
         open={modalType === "signin"}

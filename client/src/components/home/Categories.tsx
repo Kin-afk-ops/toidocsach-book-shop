@@ -20,11 +20,22 @@ export default async function Categories() {
     console.error("Lấy danh mục thất bại:", error);
   }
 
+  if (!categories || categories.length === 0) {
+    return (
+      <div className="text-center text-gray-500 font-medium py-6 animate-pulse">
+        Đang tải danh mục...
+      </div>
+    );
+  }
+
   return (
     <div className="main-container">
       <div className="p-[15px]">
-        <div className="flex text-[var(--text)] font-bold text-[20px] items-center pb-[15px] border-b border-[#ddd]">
-          <ChartBarBig className="mr-2" size={30} color="#e11d48" />
+        <div
+          className="flex items-center gap-2 pb-3 border-b border-[#ddd] 
+  text-lg sm:text-xl md:text-2xl font-bold text-[var(--text)]"
+        >
+          <ChartBarBig className="mr-2" size={24} color="#e11d48" />
           <p>Danh mục sản phẩm</p>
         </div>
 

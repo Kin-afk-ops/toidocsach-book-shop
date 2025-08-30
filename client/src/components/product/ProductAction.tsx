@@ -77,14 +77,19 @@ const ProductAction: React.FC<ChildProps> = ({
       {loading && <LoadingScreen />}
       <div className="list-container flex flex-col items-center p-4">
         <ProductImage images={images} />
-        <div className="flex justify-between w-full mt-6 grid grid-cols-2 gap-4">
-          <TransparentButton
-            content="Thêm vào giỏ hàng"
-            icon={<ShoppingCart size={18} />}
-            handleTodo={handleAddToCart}
-          />
+        <div className="w-full mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <div className="w-full sm:w-1/2">
+            <TransparentButton
+              content="Thêm vào giỏ hàng"
+              icon={<ShoppingCart size={18} />}
+              handleTodo={handleAddToCart}
+            />
+          </div>
 
-          <PrimaryButton content="Mua ngay" />
+          <div className="w-full sm:w-1/2">
+            {" "}
+            <PrimaryButton content="Mua ngay" />
+          </div>
         </div>
       </div>
     </>
