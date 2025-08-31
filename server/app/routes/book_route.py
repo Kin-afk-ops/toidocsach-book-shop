@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service,get_home_books_service,get_list_books_service,get_books_by_category_service,get_book_item_by_id
+from app.services.book_service import create_book_service,get_all_books_service,get_book_by_id_service,update_book_category_service,remove_book_category_service,get_home_books_service,get_list_books_service,get_books_by_category_service,get_book_item_by_id,update_book_service
 import math
 book_route = Blueprint("book", __name__)
 
@@ -101,6 +101,19 @@ def update_book_category(book_id):
 
     resp, status = update_book_category_service(book_id, category_id)
     return jsonify(resp), status
+
+
+
+
+@book_route.route("/book/<uuid:book_id>", methods=["PUT"])
+def update_book(book_id):
+    data = request.get_json()
+
+
+    resp, status = update_book_service(data, book_id)
+    return jsonify(resp), status
+
+
 
 
 @book_route.route("/book/<uuid:book_id>/category", methods=["DELETE"])

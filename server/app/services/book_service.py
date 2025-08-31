@@ -156,6 +156,65 @@ def update_book_category_service(book_id, category_id):
     return book.to_dict(include_detail=True, include_category=True), 200
 
 
+
+def update_book_service(data, book_id):
+    try:
+        book = BookItem.query.get(book_id)
+        if not book:
+            return {"error": "Book not found"}, 404
+
+        # Update BookItem fields
+        if "title" in data:
+            book.title = data["title"]
+        if "price" in data:
+            book.price = data["price"]
+        if "discount" in data:
+            book.discount = data["discount"]
+        if "quantity" in data:
+            book.quantity = data["quantity"]
+        if "sold_count" in data:
+            book.sold_count = data["sold_count"]
+        if "images" in data:  # danh sách [{image_url, image_public_id}]
+            book.images = data["images"]
+        if "category_id" in data:
+            book.category_id = data["category_id"]
+
+        # Update BookDetail (nếu có)
+        if not book.detail:
+            # Nếu chưa có detail thì tạo mới
+            book.detail = BookDetail(book_id=book.id)
+
+        detail = book.detail
+        if "supplier" in data:
+            detail.supplier = data["supplier"]
+        if "author" in data:
+            detail.author = data["author"]
+        if "publisher" in data:
+            detail.publisher = data["publisher"]
+        if "publish_year" in data:
+            detail.publish_year = data["publish_year"]
+        if "weight" in data:
+            detail.weight = data["weight"]
+        if "size" in data:
+            detail.size = data["size"]
+        if "quantity_of_pages" in data:
+            detail.quantity_of_pages = data["quantity_of_pages"]
+        if "description" in data:
+            detail.description = data["description"]
+        if "language" in data:
+            detail.language = data["language"]
+        if "layout" in data:
+            detail.layout = data["layout"]
+
+        db.session.commit()
+
+        return book.to_dict(include_detail=True, include_category=True), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
+
 def remove_book_category_service(book_id):
     book = BookItem.query.get(book_id)
     if not book:

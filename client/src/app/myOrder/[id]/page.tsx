@@ -49,7 +49,7 @@ const MyOrderPage = () => {
       const res = await axiosInstance.get(`/order/${userId}?page=${page}`);
       const { orders: newOrders, current_page, total_page } = res.data;
 
-      setOrders((prev) => [...prev, ...newOrders]);
+      setOrders((prev) => (page === 1 ? newOrders : [...prev, ...newOrders]));
       setCurrentPage(current_page);
       setTotalPage(total_page);
     } catch (error) {
@@ -140,7 +140,7 @@ const MyOrderPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders &&
+              {orders.length > 0 ? (
                 orders.map(
                   (order) =>
                     order.items &&
@@ -275,13 +275,23 @@ const MyOrderPage = () => {
                         )}
                       </TableRow>
                     ))
-                )}
+                )
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center py-6 text-[var(--text)]"
+                  >
+                    Không có đơn hàng
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
 
         <div className="md:hidden space-y-4">
-          {orders &&
+          {orders.length > 0 ? (
             orders.map((order, index) => (
               <div
                 key={index}
@@ -373,7 +383,12 @@ const MyOrderPage = () => {
                   </div>
                 )}
               </div>
-            ))}
+            ))
+          ) : (
+            <div className="main-container flex justify-center py-6 text-[var(--text)]">
+              Không có đơn hàng
+            </div>
+          )}
         </div>
       </div>
 

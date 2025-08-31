@@ -79,7 +79,7 @@ def recovery_password_service(email, otp, new_password):
     # Kiểm tra user tồn tại
     user = User.query.filter_by(email=email).first()
     if not user:
-        return {"error": "User không tồn tại"}, 404
+        return {"error": "Người dùng đã tồn tại"}, 404
 
     # Cập nhật mật khẩu mới
     hashed_password = generate_password_hash(new_password)
