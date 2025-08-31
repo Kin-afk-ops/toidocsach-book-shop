@@ -89,8 +89,6 @@ const SignUpBlock: React.FC<ChildProps> = ({ setLoading, setSignInMode }) => {
       .finally(() => {
         setLoading(false);
       });
-
-    console.log(values);
   };
 
   const handleSendOtp = async (): Promise<void> => {

@@ -55,7 +55,6 @@ const ListPage = () => {
             page: page,
           });
           setBookResult(res?.data);
-          console.log(slugToText(currentCateId));
         }
       } catch (error) {
         console.log(error);

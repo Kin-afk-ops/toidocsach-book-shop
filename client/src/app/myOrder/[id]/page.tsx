@@ -119,8 +119,6 @@ const MyOrderPage = () => {
       });
   };
 
-  console.log(orders);
-
   return (
     <>
       {loading && <LoadingScreen />}

@@ -108,7 +108,6 @@ const OrderPage = () => {
       .then((res) => {
         showSuccess(res?.data.message);
         const cart = res?.data.cart;
-        console.log(res.data);
 
         if (cart) {
           setCart(cart);

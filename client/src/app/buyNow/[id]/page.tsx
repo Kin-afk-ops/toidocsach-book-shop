@@ -118,7 +118,6 @@ const BuyNowPage = () => {
       })
       .then((res) => {
         showSuccess(res?.data.message);
-        console.log(res.data);
         clear();
         router.push(`/myOrder/${userId}`);
       })
