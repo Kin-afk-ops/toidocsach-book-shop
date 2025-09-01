@@ -22,7 +22,11 @@ const NewProducts: React.FC<ChildProps> = ({ products }) => {
       <HomeCartItem products={products} />
 
       <div className="flex justify-center mt-6">
-        <Link href="/categories/new-book.html" className="w-full sm:w-auto">
+        <Link
+          scroll={true}
+          href="/categories/new-book.html"
+          className="w-full sm:w-auto"
+        >
           <TransparentButton content="Xem thêm" />
         </Link>
       </div>

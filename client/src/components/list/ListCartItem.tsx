@@ -20,6 +20,7 @@ interface ChildProps {
 const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
   return (
     <Link
+      scroll={true}
       href={`/product/${formatSlug(bookItem.title)}.html?q=${bookItem.id}`}
       key={bookItem.id}
     >

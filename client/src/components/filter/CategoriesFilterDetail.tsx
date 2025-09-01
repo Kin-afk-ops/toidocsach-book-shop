@@ -15,6 +15,7 @@ const CategoriesFilterDetail: React.FC<ChildProps> = ({ categories }) => {
     <>
       <li className="group">
         <Link
+          scroll={true}
           href={`/categories/new-book.html?page=${1}`}
           className={`block cursor-pointer transition duration-100 group-hover:text-[var(--primary)] 
             text-sm md:text-base py-2

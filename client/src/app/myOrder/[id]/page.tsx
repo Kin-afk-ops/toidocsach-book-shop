@@ -172,6 +172,7 @@ const MyOrderPage = () => {
 
                         <TableCell className="w-[340px] h-[100px] text-[14px] text-[var(--text)] align-top">
                           <Link
+                            scroll={true}
                             href={`/product/${formatSlug(
                               item.book ? item.book.title : ""
                             )}.html?q=${item.book ? item.book.id : ""}`}

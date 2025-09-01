@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Bên trái */}
           <div className="col-span-12 lg:col-span-3 relative pr-0 lg:pr-6 lg:border-r border-gray-300">
-            <Link href="/">
+            <Link href="/" scroll={true}>
               <Image
                 src={"/logo.png"}
                 alt="logo"

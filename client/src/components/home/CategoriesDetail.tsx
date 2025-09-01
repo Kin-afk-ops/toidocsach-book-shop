@@ -12,6 +12,7 @@ const CategoriesDetail: React.FC<ChildProps> = ({ categories }) => {
       {categories.length !== 0 &&
         categories.map((category) => (
           <Link
+            scroll={true}
             href={`/categories/${slugify(category.title)}.html?q=${
               category.id
             }&page=${1}`}

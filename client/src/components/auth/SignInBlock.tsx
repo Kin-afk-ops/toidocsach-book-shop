@@ -136,6 +136,7 @@ const SignInBlock: React.FC<ChildProps> = ({ onClose, setLoading }) => {
       </Form>
 
       <Link
+        scroll={true}
         href="/recoveryPassword"
         className="mt-2"
         onClick={() => onClose?.()}

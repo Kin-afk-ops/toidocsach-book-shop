@@ -23,6 +23,7 @@ const HomeCartItem: React.FC<ChildProps> = ({ products }) => {
       {products.length > 0 &&
         products.map((product) => (
           <Link
+            scroll={true}
             href={`/product/${formatSlug(product.title)}.html?q=${product.id}`}
             key={product.id}
           >

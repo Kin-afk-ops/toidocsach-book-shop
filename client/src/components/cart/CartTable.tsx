@@ -180,6 +180,7 @@ const CartTable: React.FC<ChildProps> = ({ setLoading }) => {
         return (
           <div className="w-[340px] h-[119px] flex flex-col justify-between text-[14px] text-[var(--text)]">
             <Link
+              scroll={true}
               href={`/product/${formatSlug(
                 item.book ? item.book?.title : ""
               )}.html?q=${item.book ? item.book?.id : ""}`}

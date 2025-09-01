@@ -125,7 +125,7 @@ const Header = () => {
       {loading && <LoadingScreen />}
       <header className="w-full bg-white">
         <div className="mx-auto max-w-[1230px] h-[68px] flex items-center justify-between">
-          <Link href={"/"} className="shrink-0">
+          <Link scroll={true} href={"/"} className="shrink-0">
             <Image
               src="/logo.png"
               alt="logo"

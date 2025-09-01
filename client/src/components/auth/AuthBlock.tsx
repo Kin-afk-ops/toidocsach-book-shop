@@ -23,7 +23,13 @@ const AuthBlock: React.FC<ChildProps> = ({ mode }) => {
   return (
     <>
       <DialogContent
-        className="bg-white sm:max-w-[425px]"
+        className="bg-white 
+    sm:max-w-[425px] 
+    w-[95%] max-w-[425px] 
+    mx-auto 
+    left-1/2 top-1/2 
+    -translate-x-1/2 -translate-y-1/2 
+    fixed"
         onClick={(e) => e.stopPropagation()}
         onInteractOutside={(e) => {
           const target = e.target as HTMLElement;
