@@ -38,7 +38,7 @@ const ListCartItem: React.FC<ChildProps> = ({ bookItem }) => {
           </div>
         </CardHeader>
         <CardContent className="p-2 sm:p-3 flex-1 flex flex-col">
-          <CardTitle className="text-xs sm:text-sm md:text-base font-medium line-clamp-2 h-[40px]">
+          <CardTitle className="text-sm font-medium line-clamp-2 h-[40px]">
             {bookItem.title}
           </CardTitle>
           <div className="mt-2">
