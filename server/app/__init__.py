@@ -29,9 +29,18 @@ def create_app():
     CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
     load_dotenv()
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@"
-    f"{os.getenv('DB_HOST')}:{int(os.getenv('DB_PORT', 5432))}/{os.getenv('DB_NAME')}")
+    db_url = os.getenv("DATABASE_URL")
+
+    if db_url:
+      app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    else:
+    # fallback khi chạy local
+      app.config['SQLALCHEMY_DATABASE_URI'] = (
+          f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@"
+          f"{os.getenv('DB_HOST')}:{int(os.getenv('DB_PORT', 5432))}/{os.getenv('DB_NAME')}"
+      )
+
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "super-secret-key") 
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']

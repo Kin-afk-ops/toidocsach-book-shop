@@ -1,0 +1,15 @@
+ docker exec -it postgres_books bash
+pg_dump -U postgres -d books_db --inserts --no-owner --no-privileges > /var/lib/postgresql/data/books_dump.sql
+docker cp postgres_books:/var/lib/postgresql/data/books_dump.sql ./books_dump.sql
+s
+
+
+if __name__ == "__main__":
+    if ngrok_domain:
+        ngrok.set_auth_token(authtoken)
+        ngrok_url = ngrok.connect(addr=9999, domain=ngrok_domain)
+        print(f"Ngrok tunnel: {ngrok_url}")
+    else:
+        print("Running locally on http://localhost:9999")
+
+    app.run(port=9999)

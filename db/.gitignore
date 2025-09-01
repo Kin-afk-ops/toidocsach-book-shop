@@ -1,2 +1,5 @@
 pg_data/
 
+export.txt
+
+*.sql
