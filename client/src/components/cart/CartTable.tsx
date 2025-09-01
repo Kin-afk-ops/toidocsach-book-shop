@@ -25,7 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useState } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/util/formatPrice ";
-import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
+import { CartItemWithCheck } from "@/interface/cart.i";
 import axiosInstance from "@/lib/api/axiosInstance";
 import { useAuthStore } from "@/store/useUserStore";
 import { showError, showSuccess } from "@/util/styles/toast-utils";

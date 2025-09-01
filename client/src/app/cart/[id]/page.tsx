@@ -2,7 +2,6 @@
 import CartTable from "@/components/cart/CartTable";
 import PrimaryButton from "@/components/customs/PrimaryButton";
 import LoadingScreen from "@/components/loading/LoadingScreen";
-import { CartItemInterface, CartItemWithCheck } from "@/interface/cart.i";
 import { useCartStore } from "@/store/useCartStore";
 import { formatPrice } from "@/util/formatPrice ";
 import { showWarning } from "@/util/styles/toast-utils";

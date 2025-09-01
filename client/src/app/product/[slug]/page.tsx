@@ -28,7 +28,7 @@ const ProductPage = async ({ searchParams }: ProductPageProps) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/book/${bookId}`,
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
 
     if (!res.ok) {

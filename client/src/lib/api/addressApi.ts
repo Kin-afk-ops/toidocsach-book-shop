@@ -9,7 +9,7 @@ export async function getProvinces(
 ): Promise<Province[]> {
   try {
     await new Promise((resolve) => setTimeout(resolve, 800));
-    const res = await fetch(`${BASE_URL}p/`, { cache: "no-store" });
+    const res = await fetch(`${BASE_URL}p/`, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error("Failed to fetch provinces");
     return res.json();
   } catch (error) {
@@ -25,7 +25,7 @@ export async function getWards(
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<Ward[]> {
   try {
-    const res = await fetch(`${BASE_URL}w/`, { cache: "no-store" });
+    const res = await fetch(`${BASE_URL}w/`, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error("Failed to fetch wards");
     const wards: Ward[] = await res.json();
     return wards.filter((w) => w.province_code === provinceCode);

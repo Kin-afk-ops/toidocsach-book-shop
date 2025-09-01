@@ -26,8 +26,9 @@ from app.extensions import db
 def create_app():
     app = Flask(__name__)
 
-    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
     load_dotenv()
+    allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    CORS(app, supports_credentials=True, origins=allowed_origins)
 
     db_url = os.getenv("DATABASE_URL")
 

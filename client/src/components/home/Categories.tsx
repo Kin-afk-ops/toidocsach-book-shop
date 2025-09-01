@@ -8,7 +8,7 @@ export default async function Categories() {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/categories`,
-      { cache: "no-store" } // luôn lấy dữ liệu mới
+      { next: { revalidate: 60 } } // luôn lấy dữ liệu mới
     );
 
     if (!res.ok) {

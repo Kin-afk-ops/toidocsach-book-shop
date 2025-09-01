@@ -11,7 +11,7 @@ export default async function Home() {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_DOMAIN}/book/home`,
       {
-        cache: "no-store",
+        next: { revalidate: 60 },
       }
     );
 
