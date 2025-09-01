@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import LightGallery from "lightgallery/react";
 
 // import styles
@@ -23,6 +23,36 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
   const onInit = () => {
     console.log("lightGallery has been initialized");
   };
+
+  const lgRef = useRef<any>(null);
+
+  useEffect(() => {
+    let handler: (e: PopStateEvent) => void;
+
+    if (lgRef.current) {
+      const lgInstance = lgRef.current.instance;
+
+      lgInstance.on("lgAfterOpen", () => {
+        // thêm state giả
+        window.history.pushState({ gallery: true }, "");
+        handler = (event: PopStateEvent) => {
+          if (event.state?.gallery) {
+            lgInstance.closeGallery();
+          }
+        };
+        window.addEventListener("popstate", handler);
+      });
+
+      lgInstance.on("lgAfterClose", () => {
+        // xóa listener
+        if (handler) window.removeEventListener("popstate", handler);
+        // quay lại state trước
+        if (window.history.state?.gallery) {
+          window.history.back();
+        }
+      });
+    }
+  }, []);
   return (
     <div className="flex flex-col gap-4 w-full max-w-[400px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[400px] items-center">
       {/* Hình chính */}
@@ -32,6 +62,18 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
         speed={500}
         plugins={[lgThumbnail, lgZoom]}
         elementClassNames="flex gap-2 justify-start flex-wrap w-full"
+        mode="lg-fade"
+        closable={true}
+        closeOnTap={true}
+        hideBarsDelay={0}
+        isMobile={() => true} // 👈 phải là function
+        mobileSettings={{
+          controls: true,
+          showCloseIcon: true,
+          download: true,
+          rotate: false,
+          closeOnTap: true,
+        }}
       >
         <a
           className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] lg:h-[376px] cursor-pointer"
