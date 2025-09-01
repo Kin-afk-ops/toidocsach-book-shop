@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuantityProduct } from "@/store/useQuanityProductStore";
 import { formatPrice } from "@/util/formatPrice ";
 import { Minus, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 interface ChildProps {
   title: string | undefined;
   supplier: string | undefined;
@@ -35,6 +35,12 @@ const ProductInfo: React.FC<ChildProps> = ({
   const setQuantityProduct = useQuantityProduct(
     (state) => state.setQuantityProduct
   );
+  const clearQuantityProduct = useQuantityProduct((state) => state.clear);
+
+  useEffect(() => {
+    clearQuantityProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="list-container p-4 ">
