@@ -24,35 +24,6 @@ const ProductImage: React.FC<ChildProps> = ({ images }) => {
     console.log("lightGallery has been initialized");
   };
 
-  const lgRef = useRef<any>(null);
-
-  useEffect(() => {
-    let handler: (e: PopStateEvent) => void;
-
-    if (lgRef.current) {
-      const lgInstance = lgRef.current.instance;
-
-      lgInstance.on("lgAfterOpen", () => {
-        // thêm state giả
-        window.history.pushState({ gallery: true }, "");
-        handler = (event: PopStateEvent) => {
-          if (event.state?.gallery) {
-            lgInstance.closeGallery();
-          }
-        };
-        window.addEventListener("popstate", handler);
-      });
-
-      lgInstance.on("lgAfterClose", () => {
-        // xóa listener
-        if (handler) window.removeEventListener("popstate", handler);
-        // quay lại state trước
-        if (window.history.state?.gallery) {
-          window.history.back();
-        }
-      });
-    }
-  }, []);
   return (
     <div className="flex flex-col gap-4 w-full max-w-[400px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[400px] items-center">
       {/* Hình chính */}
