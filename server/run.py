@@ -1,11 +1,9 @@
 import os
 from app import create_app
-from pyngrok import ngrok
 from dotenv import load_dotenv
 
 load_dotenv()  #
-authtoken = os.getenv('NGROK_TOKEN')
-ngrok_domain = os.getenv('NGROK_DOMAIN')
+
 
 
 app = create_app()
