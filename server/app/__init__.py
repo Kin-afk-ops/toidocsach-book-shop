@@ -28,7 +28,14 @@ def create_app():
 
     load_dotenv()
     allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-    CORS(app, supports_credentials=True, origins=allowed_origins)
+    CORS(
+        app,
+        origins=allowed_origins,
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
+
 
     db_url = os.getenv("DATABASE_URL")
 
